@@ -194,19 +194,19 @@
         let isRegisterMode = false;
 
        const quizData = {
-  "title": "Đề Khảo Sát Chất Lượng Tiếng Anh 9 - Lớp 9A1 (Cấu trúc mới)",
+  "title": "Đề Khảo Sát Chất Lượng Tiếng Anh 9 - Cấu Trúc Mới",
   "duration": 50,
   "totalQuestions": 40,
   "questions": [
-    // === PHẦN 1: PRONUNCIATION (2 câu) ===
+    // === PHẦN 1: PRONUNCIATION (2 câu phát âm) ===
     {"num": 1, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["cats", "dogs", "books", "roofs"]},
     {"num": 2, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["started", "washed", "liked", "looked"]},
 
-    // === PHẦN 2: STRESS (2 câu) ===
+    // === PHẦN 2: STRESS (2 câu nhấn âm) ===
     {"num": 3, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["teacher", "student", "doctor", "degree"]},
     {"num": 4, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["beautiful", "dangerous", "expensive", "difficult"]},
 
-    // === PHẦN 3: GRAMMAR & VOCABULARY (8 câu) ===
+    // === PHẦN 3: GRAMMAR & VOCABULARY (8 câu ngữ pháp, từ vựng) ===
     {"num": 5, "category": "Grammar & Vocabulary", "questionText": "If I _______ you, I would accept that job offer immediately.", "options": ["am", "was", "were", "would be"]},
     {"num": 6, "category": "Grammar & Vocabulary", "questionText": "The company decided to _______ the meeting until next Monday.", "options": ["put off", "call off", "take off", "turn down"]},
     {"num": 7, "category": "Grammar & Vocabulary", "questionText": "By the time the police arrived, the thieves _______ with the money.", "options": ["escaped", "have escaped", "had escaped", "were escaping"]},
@@ -216,72 +216,108 @@
     {"num": 11, "category": "Grammar & Vocabulary", "questionText": "Your brother doesn't like playing video games, _______?", "options": ["does he", "doesn't he", "did he", "is he"]},
     {"num": 12, "category": "Grammar & Vocabulary", "questionText": "The air in the city is seriously _______ by exhaust fumes from vehicles.", "options": ["pollute", "pollution", "polluted", "polluting"]},
 
-    // === PHẦN 4: WORD ORDER / SENTENCE ARRANGEMENT (3 câu - Sắp xếp A, B, C đúng vị trí) ===
-    {"num": 13, "category": "Sentence Arrangement", "questionText": "Choose the correct order of the following clauses/phrases to make a meaningful sentence:\na. because she was sick\nb. Mary didn't go to school\nc. yesterday", "options": ["a - b - c", "b - a - c", "c - a - b", "b - c - a"]},
-    {"num": 14, "category": "Sentence Arrangement", "questionText": "Choose the correct order of the following clauses/phrases to make a meaningful sentence:\na. if it rains tomorrow\nb. we will cancel\nc. the football match", "options": ["a - b - c", "b - c - a", "c - b - a", "a - c - b"]},
-    {"num": 15, "category": "Sentence Arrangement", "questionText": "Choose the correct order of the following clauses/phrases to make a meaningful sentence:\na. the book\连b. which you lent me\nc. is very interesting", "options": ["a - b - c", "b - a - c", "c - a - b", "a - c - b"]},
+    // === PHẦN 4: REARRANGEMENT (3 câu sắp xếp thứ tự câu đơn lẻ a, b, c) ===
+    {
+      "num": 13, 
+      "category": "Rearrangement", 
+      "questionText": "Choose the correct order of the following sentences to make a meaningful text:\na. Additionally, it helps us relax after a long hard-working day.\nb. Reading books plays an important role in developing our knowledge.\nc. Therefore, we should build a habit of reading every day.", 
+      "options": ["b - a - c", "a - b - c", "c - b - a", "b - c - a"]
+    },
+    {
+      "num": 14, 
+      "category": "Rearrangement", 
+      "questionText": "Choose the correct order of the following sentences to make a meaningful text:\na. He works as a volunteer doctor at a local hospital now.\nb. My uncle graduated from medical university five years ago.\nc. He always takes good care of poor patients with great love.", 
+      "options": ["b - a - c", "a - b - c", "c - b - a", "b - c - a"]
+    },
+    {
+      "num": 15, 
+      "category": "Rearrangement", 
+      "questionText": "Choose the correct order of the following sentences to make a meaningful text:\na. However, the flight was delayed for two hours because of heavy rain.\nb. Yesterday, they went to the airport early to catch a flight to Paris.\nc. They felt a bit tired but excited about their upcoming holiday.", 
+      "options": ["b - a - c", "b - c - a", "a - b - c", "c - a - b"]
+    },
 
-    // === PHẦN 5: CLOSEST IN MEANING - ĐỒNG NGHĨA (2 câu) ===
-    {"num": 16, "category": "Synonyms", "questionText": "Choose the word/phrase that is CLOSEST in meaning to the underlined word:\nWe need to find a way to <u>reduce</u> the amount of plastic waste we produce.", "options": ["increase", "cut down on", "look after", "carry on"]},
-    {"num": 17, "category": "Synonyms", "questionText": "Choose the word/phrase that is CLOSEST in meaning to the underlined word:\nGarbage is <u>dumped</u> into the river, which causes severe water pollution.", "options": ["thrown away", "cleaned up", "collected", "saved"]},
+    // === PHẦN 5: SYNONYMS (2 câu đồng nghĩa) ===
+    {"num": 16, "category": "Synonyms", "questionText": "Choose the word or phrase that is CLOSEST in meaning to the underlined part:\nWe should find ways to reduce our **carbon footprint** to protect the environment.", "options": ["increase", "minimize", "destroy", "develop"]},
+    {"num": 17, "category": "Synonyms", "questionText": "Choose the word or phrase that is CLOSEST in meaning to the underlined part:\nMany international organizations have been set up to **look after** endangered animals.", "options": ["take care of", "take part in", "look for", "give up"]},
 
-    // === PHẦN 6: OPPOSITE IN MEANING - TRÁI NGHĨA (2 câu) ===
-    {"num": 18, "category": "Antonyms", "questionText": "Choose the word/phrase that is OPPOSITE in meaning to the underlined word:\nUsing public transport is a very <u>effective</u> way to reduce traffic jams.", "options": ["useful", "ineffective", "convenient", "efficient"]},
-    {"num": 19, "category": "Antonyms", "questionText": "Choose the word/phrase that is OPPOSITE in meaning to the underlined word:\nWhen you go shopping, you should buy <u>reusable</u> bags instead of plastic ones.", "options": ["single-use", "recyclable", "expensive", "wasteful"]},
+    // === PHẦN 6: ANTONYMS (2 câu trái nghĩa) ===
+    {"num": 18, "category": "Antonyms", "questionText": "Choose the word or phrase that is OPPOSITE in meaning to the underlined part:\nUsing public transport is a very **effective** way to reduce traffic jams.", "options": ["useful", "efficient", "ineffective", "helpless"]},
+    {"num": 19, "category": "Antonyms", "questionText": "Choose the word or phrase that is OPPOSITE in meaning to the underlined part:\nThe dynamic teacher **encouraged** all students to participate in the English debate club.", "options": ["discouraged", "supported", "allowed", "persuaded"]},
 
-    // === PHẦN 7: CLOZE TEST - ĐIỀN KHUYẾT (5 câu) ===
-    {"num": 20, "category": "Cloze Test", "questionText": "Context: English is a very useful (20)_______. If we know English, we can go to any country we like. We will not find it hard to make people (21)_______ what we want to say. English also helps us to learn all kinds of (22)_______. Hundreds of books are (23)______ in English every day in many countries. Therefore, the English language has helped to spread better understanding and friendship (24)_______ countries of the world.\n\nChoose the best option to fill in the blank 20:", "options": ["language", "country", "subject", "science"]},
+    // === PHẦN 7: CLOZE TEST (Bài đọc điền khuyết - 6 câu) ===
+    {"num": 20, "category": "Cloze Test", "questionText": "Context: English is a very useful (20)_______. If we know English, we can go to any country we like. We will not find it hard to make people (21)_______ what we want to say. English also helps us to learn all kinds of (22)_______. Hundreds of books are (23)______ in English every day in many countries. Therefore, the English language has helped to spread better understanding and friendship (24)_______ countries of the world. It is also the language of international (25)_______ and trade.\n\nChoose the best option to fill in the blank 20:", "options": ["language", "country", "subject", "science"]},
     {"num": 21, "category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nChoose the best option to fill in the blank 21:", "options": ["understand", "understanding", "understood", "to understand"]},
-    {"num": 22, "category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nChoose the best option to fill in the blank 22:", "options": ["subjects", "knowledge", "books", "skills"]},
+    {"num": 22, "category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nChoose the best option to fill in the blank 22:", "options": ["knowledge", "subjects", "books", "skills"]},
     {"num": 23, "category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nChoose the best option to fill in the blank 23:", "options": ["written", "write", "wrote", "writing"]},
     {"num": 24, "category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nChoose the best option to fill in the blank 24:", "options": ["among", "between", "from", "to"]},
+    {"num": 25, "category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nChoose the best option to fill in the blank 25:", "options": ["communication", "communicated", "communicate", "communicative"]},
 
-    // === PHẦN 8: READING COMPREHENSION - BÀI ĐỌC TÌM Ý (5 câu) ===
-    {"num": 25, "category": "Reading Comprehension", "questionText": "Passage: Every year, millions of tons of plastic waste are dumped into the oceans, causing severe damage to marine ecosystems. Sea turtles, whales, and seabirds often mistake plastic bags for food, leading to fatal consequences. Furthermore, microplastics have been found in the fish we eat, posing threats to human health. To address this crisis, many countries have started banning single-use plastics and encouraging people to use reusable bags and bottles. Small changes in our daily habits can make a big difference in protecting our planet.\n\nQuestion: What is the main topic of the passage?", "options": ["The beauty of marine ecosystems", "The dangers of plastic pollution in oceans", "How to make reusable bags", "The eating habits of sea turtles"]},
-    {"num": 26, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 25)\n\nQuestion: According to the passage, why do marine animals eat plastic bags?", "options": ["Because plastic bags look like food to them", "Because they like the taste of plastic", "Because there is no other food in the ocean", "Because plastic helps them swim faster"]},
-    {"num": 27, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 25)\n\nQuestion: What solution is mentioned in the passage to address the plastic crisis?", "options": ["Dumping more waste into the land instead", "Banning single-use plastics and using reusable items", "Stopping humans from eating fish", "Cleaning the entire ocean in one day"]},
-    {"num": 28, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 25)\n\nQuestion: The word 'fatal' in the passage is closest in meaning to _______.", "options": ["dangerous", "harmless", "deadly", "safe"]},
-    {"num": 29, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 25)\n\nQuestion: Which of the following is NOT true according to the passage?", "options": ["Microplastics are found in the fish humans eat.", "Only sea turtles are affected by plastic waste.", "Many countries have banned single-use plastics.", "Small habits can help protect our planet."]},
+    // === PHẦN 8: READING COMPREHENSION (Bài đọc hiểu tìm ý - 6 câu) ===
+    {"num": 26, "category": "Reading Comprehension", "questionText": "Passage: Every year, millions of tons of plastic waste are dumped into the oceans, causing severe damage to marine ecosystems. Sea turtles, whales, and seabirds often mistake plastic bags for food, leading to fatal consequences. Furthermore, microplastics have been found in the fish we eat, posing threats to human health. To address this crisis, many countries have started banning single-use plastics and encouraging people to use reusable bags and bottles. Small changes in our daily habits can make a big difference in protecting our planet.\n\nQuestion: What is the main topic of the passage?", "options": ["The beauty of marine ecosystems", "The dangers of plastic pollution in oceans", "How to make reusable bags", "The eating habits of sea turtles"]},
+    {"num": 27, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 26)\n\nQuestion: According to the passage, why do marine animals eat plastic bags?", "options": ["Because plastic bags look like food to them", "Because they like the taste of plastic", "Because there is no other food in the ocean", "Because plastic helps them swim faster"]},
+    {"num": 28, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 26)\n\nQuestion: What solution is mentioned in the passage to address the plastic crisis?", "options": ["Dumping more waste into the land instead", "Banning single-use plastics and using reusable items", "Stopping humans from eating fish", "Cleaning the entire ocean in one day"]},
+    {"num": 29, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 26)\n\nQuestion: The word 'fatal' in the passage is closest in meaning to _______.", "options": ["dangerous", "deadly", "safe", "important"]},
+    {"num": 30, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 26)\n\nQuestion: Which of the following is TRUE according to the passage?", "options": ["Microplastics do not affect human health.", "Only sea turtles are harmed by plastic waste.", "Many countries have banned single-use plastics.", "Small daily changes cannot help the planet."]},
+    {"num": 31, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 26)\n\nQuestion: What can be inferred from the last sentence of the passage?", "options": ["Individual actions play a role in environmental protection.", "Protecting the planet is too difficult for individuals.", "We don't need to change our habits.", "Only governments can save the planet."]},
 
-    // === PHẦN 9: ERROR IDENTIFICATION - TÌM LỖI SAI (4 câu) ===
-    {"num": 30, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: The women (A) which (B) lives next door is (C) a famous doctor (D).", "options": ["women", "which", "is", "a famous doctor"]},
-    {"num": 31, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: Although (A) his broken leg (B), he managed to (C) win the race (D).", "options": ["Although", "his broken leg", "managed to", "win the race"]},
-    {"num": 32, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: She didn't (A) went (B) to school yesterday (C) due to her illness (D).", "options": ["didn't", "went", "yesterday", "due to"]},
-    {"num": 33, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: The internet (A) is a (B) very useful invention (C) in modern life, is it (D)?", "options": ["The internet", "is a", "very useful invention", "is it"]},
+    // === PHẦN 9: ERROR IDENTIFICATION (4 câu tìm lỗi sai) ===
+    {"num": 32, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: The women (A) which (B) lives next door is (C) a famous doctor (D).", "options": ["women", "which", "is", "a famous doctor"]},
+    {"num": 33, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: Although (A) his broken leg (B), he managed to (C) win the race (D).", "options": ["Although", "his broken leg", "managed to", "win the race"]},
+    {"num": 34, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: She didn't (A) went (B) to school yesterday (C) due to her illness (D).", "options": ["didn't", "went", "yesterday", "due to"]},
+    {"num": 35, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: The internet (A) is a (B) very useful invention (C) in modern life, is it (D)?", "options": ["The internet", "is a", "very useful invention", "is it"]},
 
-    // === PHẦN 10: SENTENCE TRANSFORMATION - VIẾT LẠI CÂU ĐỒNG NGHĨA (3 câu) ===
-    {"num": 34, "category": "Sentence Transformation", "questionText": "Choose the sentence that is closest in meaning to the given one:\n'I will visit my grandmother tomorrow,' John said.", "options": ["John said he will visit his grandmother tomorrow.", "John said he would visit his grandmother the next day.", "John said he would visit my grandmother tomorrow.", "John told he would visit his grandmother the next day."]},
-    {"num": 35, "category": "Sentence Transformation", "questionText": "Choose the sentence that is closest in meaning to the given one:\nThey have just repaired the broken bridge.", "options": ["The broken bridge has just been repaired.", "The broken bridge have just been repaired.", "The broken bridge was just repaired.", "The broken bridge has just repaired."]},
-    {"num": 36, "category": "Sentence Transformation", "questionText": "Choose the sentence that is closest in meaning to the given one:\nThis is the most interesting movie I have ever watched.", "options": ["I have watched many interesting movies like this before.", "I have never watched a more interesting movie than this one.", "This movie is less interesting than the ones I have watched.", "I used to watch more interesting movies than this one."]},
+    // === PHẦN 10: SENTENCE TRANSFORMATION (3 câu viết lại câu đồng nghĩa) ===
+    {"num": 36, "category": "Sentence Transformation", "questionText": "Choose the sentence that is closest in meaning to the given one:\n'I will visit my grandmother tomorrow,' John said.", "options": ["John said he will visit his grandmother tomorrow.", "John said he would visit his grandmother the next day.", "John said he would visit my grandmother tomorrow.", "John told he would visit his grandmother the next day."]},
+    {"num": 37, "category": "Sentence Transformation", "questionText": "Choose the sentence that is closest in meaning to the given one:\nThey have just repaired the broken bridge.", "options": ["The broken bridge has just been repaired.", "The broken bridge have just been repaired.", "The broken bridge was just repaired.", "The broken bridge has just repaired."]},
+    {"num": 38, "category": "Sentence Transformation", "questionText": "Choose the sentence that is closest in meaning to the given one:\nThis is the most interesting movie I have ever watched.", "options": ["I have watched many interesting movies like this before.", "I have never watched a more interesting movie than this one.", "This movie is less interesting than the ones I have watched.", "I used to watch more interesting movies than this one."]},
 
-    // === PHẦN 11: SENTENCE COMBINATION - LIÊN KẾT 2 VẾ CỦA CÂU (2 câu) ===
-    {"num": 37, "category": "Sentence Combination", "questionText": "Choose the sentence that best combines the two given sentences:\nHe was tired. He stayed up late to finish his project.", "options": ["He stayed up late to finish his project because he was tired.", "Although he was tired, he stayed up late to finish his project.", "He was tired, so he stayed up late to finish his project.", "Despite he was tired, he stayed up late to finish his project."]},
-    {"num": 38, "category": "Sentence Combination", "questionText": "Choose the sentence that best combines the two given sentences:\nThe rain was very heavy. We couldn't go to the football match.", "options": ["The rain was so heavy that we couldn't go to the football match.", "The heavy rain made us can't go to the football match.", "Although it rained heavily, we went to the football match.", "We could go to the football match if it didn't rain heavily."]},
-
-    // === BỔ SUNG NỐT CÁC CÂU CÒN LẠI CỦA ĐỀ CŨ ĐỂ ĐỦ 40 CÂU THUỘC NGỮ PHÁP (Nâng tổng số câu Ngữ Pháp bổ trợ) ===
-    {"num": 39, "category": "Grammar & Vocabulary", "questionText": "If it _______ tomorrow, we will go for a picnic.", "options": ["rains", "will rain", "rained", "is raining"]},
-    {"num": 40, "category": "Grammar & Vocabulary", "questionText": "The children are looking forward to _______ the zoo this weekend.", "options": ["visit", "visiting", "visited", "to visit"]}
+    // === PHẦN 11: SENTENCE COMBINATION (2 câu liên kết vế/câu) ===
+    {"num": 39, "category": "Sentence Combination", "questionText": "Choose the best sentence that combines the two given sentences:\nIt rained heavily. We couldn't go to the football match.", "options": ["The heavy rain made us can't go to the football match.", "Although it rained heavily, we went to the football match.", "The rain was so heavy that we couldn't go to the football match.", "We could go to the football match if it didn't rain heavily."]},
+    {"num": 40, "category": "Sentence Combination", "questionText": "Choose the best sentence that combines the two given sentences:\nHe was very tired. He still tried to finish his homework before midnight.", "options": ["Tired as he was, he tried to finish his homework before midnight.", "Because he was tired, he tried to finish his homework before midnight.", "He was too tired to finish his homework before midnight.", "He was tired, so he tried to finish his homework before midnight."]}
   ]
 };
 
 const answerKeys = {
-  "1": "dogs", "2": "started", "3": "degree", "4": "expensive",
-  "5": "were", "6": "put off", "7": "had escaped", "8": "reading",
-  "9": "which", "10": "since", "11": "does he", "12": "polluted",
-  "13": "b - a - c", "14": "b - c - a", "15": "a - b - c",
-  "16": "cut down on", "17": "thrown away", "18": "ineffective", "19": "single-use",
-  "20": "language", "21": "understand", "22": "knowledge", "23": "written", "24": "among",
-  "25": "The dangers of plastic pollution in oceans",
-  "26": "Because plastic bags look like food to them",
-  "27": "Banning single-use plastics and using reusable items",
-  "28": "deadly", "29": "Only sea turtles are affected by plastic waste.",
-  "30": "which", "31": "Although", "32": "went", "33": "is it",
-  "34": "John said he would visit his grandmother the next day.",
-  "35": "The broken bridge has just been repaired.",
-  "36": "I have never watched a more interesting movie than this one.",
-  "37": "Although he was tired, he stayed up late to finish his project.",
-  "38": "The rain was so heavy that we couldn't go to the football match.",
-  "39": "rains", "40": "visiting"
+  "1": "dogs", 
+  "2": "started", 
+  "3": "degree", 
+  "4": "expensive", 
+  "5": "were", 
+  "6": "put off", 
+  "7": "had escaped", 
+  "8": "reading", 
+  "9": "which", 
+  "10": "since", 
+  "11": "does he", 
+  "12": "polluted", 
+  "13": "b - a - c", 
+  "14": "b - a - c", 
+  "15": "b - a - c", 
+  "16": "minimize", 
+  "17": "take care of", 
+  "18": "ineffective", 
+  "19": "discouraged", 
+  "20": "language", 
+  "21": "understand", 
+  "22": "knowledge", 
+  "23": "written", 
+  "24": "among", 
+  "25": "communication", 
+  "26": "The dangers of plastic pollution in oceans", 
+  "27": "Because plastic bags look like food to them", 
+  "28": "Banning single-use plastics and using reusable items", 
+  "29": "deadly", 
+  "30": "Many countries have banned single-use plastics.", 
+  "31": "Individual actions play a role in environmental protection.", 
+  "32": "which", 
+  "33": "Although", 
+  "34": "went", 
+  "35": "is it", 
+  "36": "John said he would visit his grandmother the next day.", 
+  "37": "The broken bridge has just been repaired.", 
+  "38": "I have never watched a more interesting movie than this one.", 
+  "39": "The rain was so heavy that we couldn't go to the football match.", 
+  "40": "Tired as he was, he tried to finish his homework before midnight."
 };
 
         let studentAnswers = {};
