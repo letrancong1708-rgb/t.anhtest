@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Kiểm tra Tiếng Anh 9 - Lớp 9A1</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f0f2f5; color: #333; display: flex; flex-direction: column; min-height: 100vh; }
+        
+        /* Giao diện Đăng nhập / Đăng ký */
+        .login-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .login-card { background: white; padding: 30px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
+        .login-card h2 { color: #1a73e8; margin-bottom: 10px; }
+        .login-card p { color: #5f6368; font-size: 14px; margin-bottom: 20px; }
+        .form-group { text-align: left; margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 14px; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #dadce0; border-radius: 6px; font-size: 16px; outline: none; }
+        .form-group input:focus { border-color: #1a73e8; }
+        
+        .btn-auth { background-color: #1a73e8; color: white; border: none; padding: 12px; width: 100%; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-auth:hover { background-color: #1557b0; }
+        
+        .toggle-link { margin-top: 15px; font-size: 14px; color: #5f6368; }
+        .toggle-link span { color: #1a73e8; cursor: pointer; font-weight: bold; text-decoration: underline; }
+        
+        .error-msg { color: #d93025; font-size: 14px; margin-top: 10px; display: none; }
+        .success-msg { color: #34a853; font-size: 14px; margin-top: 10px; display: none; }
+
+        /* Màn hình làm bài */
+        .quiz-page { display: none; flex-direction: column; flex: 1; }
+        header { background-color: #1a73e8; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        header h1 { font-size: 18px; }
+        .user-info { font-weight: 600; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px; font-size: 13px; }
+        
+        .container { display: flex; flex: 1; flex-direction: row; }
+        .quiz-section { flex: 3; padding: 20px; }
+        .sidebar { flex: 1; background-color: white; border-left: 1px solid #e0e0e0; padding: 20px; display: flex; flex-direction: column; gap: 20px; position: sticky; top: 70px; height: calc(100vh - 70px); }
+        .timer-box { background-color: #e8f0fe; color: #1a73e8; padding: 15px; border-radius: 8px; text-align: center; font-size: 24px; font-weight: bold; border: 1px solid #d2e3fc; }
+        .grid-title { font-weight: bold; margin-bottom: 5px; color: #5f6368; }
+        .nav-grid { display: grid; grid-template-columns: repeat(5, 10fr); gap: 8px; max-height: 250px; overflow-y: auto; padding: 5px; }
+        .nav-item { background-color: #f1f3f4; border: 1px solid #dadce0; border-radius: 4px; padding: 10px 0; text-align: center; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+        .nav-item.answered { background-color: #1a73e8; color: white; border-color: #1a73e8; }
+        
+        .question-card { background: white; padding: 20px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-left: 5px solid #bdc1c6; }
+        .question-card.active-card { border-left-color: #1a73e8; }
+        .category-tag { display: inline-block; background: #e8f0fe; color: #1a73e8; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-bottom: 10px; }
+        .question-text { font-size: 16px; font-weight: 600; margin-bottom: 15px; line-height: 1.5; white-space: pre-line; }
+        .options-list { display: flex; flex-direction: column; gap: 10px; }
+        .option-item { display: flex; align-items: center; gap: 10px; padding: 12px 15px; border: 1px solid #dadce0; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
+        .option-item:hover { background-color: #f8f9fa; border-color: #bcc1c6; }
+        
+        .btn-submit { background-color: #34a853; color: white; border: none; padding: 15px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: background 0.2s; margin-top: auto; width: 100%; }
+        
+        /* Giao diện Bảng kết quả Giáo Viên */
+        .teacher-page { display: none; flex-direction: column; flex: 1; padding: 20px; }
+        .teacher-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-top: 20px; }
+        .teacher-card h2 { color: #1a73e8; margin-bottom: 15px; font-size: 20px; }
+        .table-responsive { width: 100%; overflow-x: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 15px; }
+        th, td { padding: 12px 15px; border-bottom: 1px solid #dadce0; vertical-align: middle; }
+        th { background-color: #f8f9fa; font-weight: 600; color: #5f6368; }
+        tr:hover { background-color: #f1f3f4; }
+        .score-badge { display: inline-block; padding: 4px 8px; background: #e8f0fe; color: #1a73e8; font-weight: bold; border-radius: 4px; }
+        .btn-refresh { background: #1a73e8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; float: right; }
+        
+        /* Nút xóa dành cho giáo viên */
+        .btn-delete { background-color: #d93025; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600; transition: background 0.2s; }
+        .btn-delete:hover { background-color: #b31412; }
+
+        #result-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; text-align: center; max-width: 400px; width: 90%; }
+        .modal-score { font-size: 48px; font-weight: bold; color: #1a73e8; margin: 15px 0; }
+        .btn-close { background: #1a73e8; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+
+        @media (max-width: 768px) {
+            .container { flex-direction: column-reverse; }
+            .sidebar { position: relative; top: 0; height: auto; border-left: none; border-bottom: 1px solid #e0e0e0; }
+            .nav-grid { grid-template-columns: repeat(8, 10fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container" id="auth-screen">
+        <div class="login-card">
+            <h2 id="auth-title">Hệ Thống Lớp 9A1</h2>
+            <p id="auth-desc">Vui lòng đăng nhập để làm bài tập</p>
+            
+            <div class="form-group">
+                <label>Email tài khoản</label>
+                <input type="email" id="user-email" placeholder="Nhập email (ví dụ: linh@9a1.com)">
+            </div>
+            <div class="form-group">
+                <label>Mật khẩu</label>
+                <input type="password" id="user-password" placeholder="Mật khẩu (tối thiểu 6 ký tự)">
+            </div>
+            
+            <button class="btn-auth" id="btn-submit-auth" onclick="handleSubmitAuth()">Đăng Nhập</button>
+            
+            <div class="error-msg" id="error-msg">Lỗi xác thực dữ liệu!</div>
+            <div class="success-msg" id="success-msg">Đăng ký thành công! Hãy đăng nhập.</div>
+            
+            <div class="toggle-link" id="toggle-auth-text">
+                Chưa có tài khoản? <span onclick="window.switchAuthMode(true)">Đăng ký ngay</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="quiz-page" id="quiz-screen">
+        <header>
+            <h1 id="quiz-title">Đề Khảo Sát Tiếng Anh</h1>
+            <div class="user-info" id="user-display">Đang xác thực...</div>
+        </header>
+
+        <div class="container">
+            <div class="quiz-section" id="questions-container"></div>
+            <div class="sidebar">
+                <div class="timer-box" id="timer">50:00</div>
+                <div>
+                    <div class="grid-title">Tiến độ làm bài:</div>
+                    <div class="nav-grid" id="nav-grid"></div>
+                </div>
+                <button class="btn-submit" onclick="submitQuiz()">Nộp Bài Lên Firebase</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="teacher-page" id="teacher-screen">
+        <header>
+            <h1>Bảng Điều Khiển - Lớp 9A1</h1>
+            <div class="user-info" id="teacher-display">Giáo viên</div>
+        </header>
+        
+        <div class="teacher-card">
+            <button class="btn-refresh" onclick="window.loadSubmissions()">Tải Lại Dữ Liệu</button>
+            <h2>Danh Sách Học Sinh Đã Nộp Bài</h2>
+            <p style="color: #5f6368; font-size: 14px;">Kéo dữ liệu trực tiếp theo thời gian thực từ Firestore Database collection "submissions".</p>
+            
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Email Học Sinh</th>
+                            <th>Số Câu Đúng</th>
+                            <th>Điểm Số</th>
+                            <th>Thời Gian Nộp Bài</th>
+                            <th>Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="submissions-table-body">
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: #888;">Đang tải danh sách học sinh nộp bài...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="result-modal">
+        <div class="modal-content">
+            <h2>Kết Quả Đã Ghi Nhận!</h2>
+            <div class="modal-score" id="score-text">0.0</div>
+            <p id="correct-count-text" style="margin-bottom: 20px; color: #5f6368;"></p>
+            <button class="btn-close" onclick="location.reload()">Thoát hệ thống</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // *** CẤU HÌNH FIREBASE ***
+        const firebaseConfig = {
+            apiKey: "AIzaSyA2QpVXJQTAmMgfB0lmMaEzf2dPTjWhf10",
+            authDomain: "testtanh.firebaseapp.com",
+            projectId: "testtanh",
+            storageBucket: "testtanh.firebasestorage.app",
+            messagingSenderId: "451482778226",
+            appId: "1:451482778226:web:53347cf489a87c6b30a0eb",
+            measurementId: "G-B650J8Y7FT"
+        };
+
+        // ĐỊNH NGHĨA EMAIL GIÁO VIÊN CỐ ĐỊNH
+        const TEACHER_EMAIL = "giaovien@9a1.com";
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let isRegisterMode = false;
+
+        const quizData = {
+          "title": "Đề Khảo Sát Chất Lượng Tiếng Anh 9 - Lớp 9A1",
+          "duration": 50,
+          "totalQuestions": 40,
+          "questions": [
+            {"num": 1, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["cats", "dogs", "books", "roofs"]},
+            {"num": 2, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["started", "washed", "liked", "looked"]},
+            {"num": 3, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["climate", "livable", "city", "discussion"]},
+            {"num": 4, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["thank", "think", "that", "thing"]},
+            {"num": 5, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["teacher", "student", "doctor", "degree"]},
+            {"num": 6, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["beautiful", "dangerous", "expensive", "difficult"]},
+            {"num": 7, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["agree", "borrow", "decide", "refuse"]},
+            {"num": 8, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["education", "information", "communication", "preparation"]},
+            {"num": 9, "category": "Grammar & Vocabulary", "questionText": "If I _______ you, I would accept that job offer immediately.", "options": ["am", "was", "were", "would be"]},
+            {"num": 10, "category": "Grammar & Vocabulary", "questionText": "The company decided to _______ the meeting until next Monday.", "options": ["put off", "call off", "take off", "turn down"]},
+            {"num": 11, "category": "Grammar & Vocabulary", "questionText": "By the time the police arrived, the thieves _______ with the money.", "options": ["escaped", "have escaped", "had escaped", "were escaping"]},
+            {"num": 12, "category": "Grammar & Vocabulary", "questionText": "She enjoys _______ books in her free time.", "options": ["to read", "reading", "read", "reads"]},
+            {"num": 13, "category": "Grammar & Vocabulary", "questionText": "The book _______ you lent me yesterday is very interesting.", "options": ["which", "who", "whom", "whose"]},
+            {"num": 14, "category": "Grammar & Vocabulary", "questionText": "He has been playing the guitar _______ 2020.", "options": ["for", "since", "in", "during"]},
+            {"num": 15, "category": "Grammar & Vocabulary", "questionText": "Your brother doesn't like playing video games, _______?", "options": ["does he", "doesn't he", "did he", "is he"]},
+            {"num": 16, "category": "Grammar & Vocabulary", "questionText": "The air in the city is seriously _______ by exhaust fumes from vehicles.", "options": ["pollute", "pollution", "polluted", "polluting"]},
+            {"num": 17, "category": "Grammar & Vocabulary", "questionText": "If it _______ tomorrow, we will go for a picnic.", "options": ["rains", "will rain", "rained", "is raining"]},
+            {"num": 18, "category": "Grammar & Vocabulary", "questionText": "He drove _______ than his friend to arrive on time.", "options": ["carefully", "more carefully", "as careful", "most carefully"]},
+            {"num": 19, "category": "Grammar & Vocabulary", "questionText": "The children are looking forward to _______ the zoo this weekend.", "options": ["visit", "visiting", "visited", "to visit"]},
+            {"num": 20, "category": "Grammar & Vocabulary", "questionText": "This house _______ by my grandfather in 1995.", "options": ["built", "was built", "has built", "is built"]},
+            {"num": 21, "category": "Grammar & Vocabulary", "questionText": "The man _______ spoke to you at the store is my uncle.", "options": ["who", "which", "whom", "whose"]},
+            {"num": 22, "category": "Grammar & Vocabulary", "questionText": "Mary wishes she _______ a professional singer in the future.", "options": ["is", "was", "will be", "could be"]},
+            {"num": 23, "category": "Grammar & Vocabulary", "questionText": "They went on a walk _______ the weather was very cold.", "options": ["because", "although", "despite", "in spite of"]},
+            {"num": 24, "category": "Grammar & Vocabulary", "questionText": "Could you please _______ the television? Nobody is watching it.", "options": ["turn on", "turn off", "look after", "go on"]},
+            {"num": 25, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: The women (A) which (B) lives next door is (C) a famous doctor (D).", "options": ["women", "which", "is", "a famous doctor"]},
+            {"num": 26, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: Although (A) his broken leg (B), he managed to (C) win the race (D).", "options": ["Although", "his broken leg", "managed to", "win the race"]},
+            {"num": 27, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: She didn't (A) went (B) to school yesterday (C) due to her illness (D).", "options": ["didn't", "went", "yesterday", "due to"]},
+            {"num": 28, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: The internet (A) is a (B) very useful invention (C) in modern life, is it (D)?", "options": ["The internet", "is a", "very useful invention", "is it"]},
+            {"num": 29, "category": "Cloze Test", "questionText": "Context: English is a very useful (29)_______. If we know English, we can go to any country we like. We will not find it hard to make people (30)_______ what we want to say. English also helps us to learn all kinds of (31)_______. Hundreds of books are (32)______ in English every day in many countries. Therefore, the English language has helped to spread better understanding and friendship (33)_______ countries of the world.\n\nChoose the best option to fill in the blank 29:", "options": ["language", "country", "subject", "science"]},
+            {"num": 30, "category": "Cloze Test", "questionText": "Context: English is a very useful (29)_______. If we know English, we can go to any country we like. We will not find it hard to make people (30)_______ what we want to say. English also helps us to learn all kinds of (31)_______. Hundreds of books are (32)______ in English every day in many countries. Therefore, the English language has helped to spread better understanding and friendship (33)_______ countries of the world.\n\nChoose the best option to fill in the blank 30:", "options": ["understand", "understanding", "understood", "to understand"]},
+            {"num": 31, "category": "Cloze Test", "questionText": "Context: English is a very useful (29)_______. If we know English, we can go to any country we like. We will not find it hard to make people (30)_______ what we want to say. English also helps us to learn all kinds of (31)_______. Hundreds of books are (32)______ in English every day in many countries. Therefore, the English language has helped to spread better understanding and friendship (33)_______ countries of the world.\n\nChoose the best option to fill in the blank 31:", "options": ["subjects", "knowledge", "books", "skills"]},
+            {"num": 32, "category": "Cloze Test", "questionText": "Context: English is a very useful (29)_______. If we know English, we can go to any country we like. We will not find it hard to make people (30)_______ what we want to say. English also helps us to learn all kinds of (31)_______. Hundreds of books are (32)______ in English every day in many countries. Therefore, the English language has helped to spread better understanding and friendship (33)_______ countries of the world.\n\nChoose the best option to fill in the blank 32:", "options": ["written", "write", "wrote", "writing"]},
+            {"num": 33, "category": "Cloze Test", "questionText": "Context: English is a very useful (29)_______. If we know English, we can go to any country we like. We will not find it hard to make people (30)_______ what we want to say. English also helps us to learn all kinds of (31)_______. Hundreds of books are (32)______ in English every day in many countries. Therefore, the English language has helped to spread better understanding and friendship (33)_______ countries of the world.\n\nChoose the best option to fill in the blank 33:", "options": ["among", "between", "from", "to"]},
+            {"num": 34, "category": "Reading Comprehension", "questionText": "Passage: Every year, millions of tons of plastic waste are dumped into the oceans, causing severe damage to marine ecosystems. Sea turtles, whales, and seabirds often mistake plastic bags for food, leading to fatal consequences. Furthermore, microplastics have been found in the fish we eat, posing threats to human health. To address this crisis, many countries have started banning single-use plastics and encouraging people to use reusable bags and bottles. Small changes in our daily habits can make a big difference in protecting our planet.\n\nQuestion: What is the main topic of the passage?", "options": ["The beauty of marine ecosystems", "The dangers of plastic pollution in oceans", "How to make reusable bags", "The eating habits of sea turtles"]},
+            {"num": 35, "category": "Reading Comprehension", "questionText": "Passage: Every year, millions of tons of plastic waste are dumped into the oceans, causing severe damage to marine ecosystems. Sea turtles, whales, and seabirds often mistake plastic bags for food, leading to fatal consequences. Furthermore, microplastics have been found in the fish we eat, posing threats to human health. To address this crisis, many countries have started banning single-use plastics and encouraging people to use reusable bags and bottles. Small changes in our daily habits can make a big difference in protecting our planet.\n\nQuestion: According to the passage, why do marine animals eat plastic bags?", "options": ["Because plastic bags look like food to them", "Because they like the taste of plastic", "Because there is no other food in the ocean", "Because plastic helps them swim faster"]},
+            {"num": 36, "category": "Reading Comprehension", "questionText": "Passage: Every year, millions of tons of plastic waste are dumped into the oceans, causing severe damage to marine ecosystems. Sea turtles, whales, and seabirds often mistake plastic bags for food, leading to fatal consequences. Furthermore, microplastics have been found in the fish we eat, posing threats to human health. To address this crisis, many countries have started banning single-use plastics and encouraging people to use reusable bags and bottles. Small changes in our daily habits can make a big difference in protecting our planet.\n\nQuestion: What solution is mentioned in the passage to address the plastic crisis?", "options": ["Dumping more waste into the land instead", "Banning single-use plastics and using reusable items", "Stopping humans from eating fish", "Cleaning the entire ocean in one day"]},
+            {"num": 37, "category": "Sentence Transformation", "questionText": "Choose the sentence that is closest in meaning to the given one:\n'I will visit my grandmother tomorrow,' John said.", "options": ["John said he will visit his grandmother tomorrow.", "John said he would visit his grandmother the next day.", "John said he would visit my grandmother tomorrow.", "John told he would visit his grandmother the next day."]},
+            {"num": 38, "category": "Sentence Transformation", "questionText": "Choose the sentence that is closest in meaning to the given one:\nThey have just repaired the broken bridge.", "options": ["The broken bridge has just been repaired.", "The broken bridge have just been repaired.", "The broken bridge was just repaired.", "The broken bridge has just repaired."]},
+            {"num": 39, "category": "Sentence Transformation", "questionText": "Choose the sentence that is closest in meaning to the given one:\nBecause of the heavy rain, we couldn't go to the football match.", "options": ["The heavy rain made us can't go to the football match.", "Although it rained heavily, we went to the football match.", "The rain was so heavy that we couldn't go to the football match.", "We could go to the football match if it didn't rain heavily."]},
+            {"num": 40, "category": "Sentence Transformation", "questionText": "Choose the sentence that is closest in meaning to the given one:\nThis is the most interesting movie I have ever watched.", "options": ["I have watched many interesting movies like this before.", "I have never watched a more interesting movie than this one.", "This movie is less interesting than the ones I have watched.", "I used to watch more interesting movies than this one."]}
+          ]
+        };
+
+        const answerKeys = {
+            "1": "dogs", "2": "started", "3": "climate", "4": "that", "5": "degree",
+            "6": "expensive", "7": "borrow", "8": "communication", "9": "were", "10": "put off",
+            "11": "had escaped", "12": "reading", "13": "which", "14": "since", "15": "does he",
+            "16": "polluted", "17": "rains", "18": "more carefully", "19": "visiting", "20": "was built",
+            "21": "who", "22": "could be", "23": "although", "24": "turn off", "25": "which",
+            "26": "Although", "27": "went", "28": "is it", "29": "language", "30": "understand",
+            "31": "knowledge", "32": "written", "33": "among",
+            "34": "The dangers of plastic pollution in oceans",
+            "35": "Because plastic bags look like food to them",
+            "36": "Banning single-use plastics and using reusable items",
+            "37": "John said he would visit his grandmother the next day.",
+            "38": "The broken bridge has just been repaired.",
+            "39": "The rain was so heavy that we couldn't go to the football match.",
+            "40": "I have never watched a more interesting movie than this one."
+        };
+
+        let studentAnswers = {};
+        let timeRemaining = quizData.duration * 60;
+
+        window.switchAuthMode = function(toRegister) {
+            isRegisterMode = toRegister;
+            const title = document.getElementById('auth-title');
+            const desc = document.getElementById('auth-desc');
+            const btn = document.getElementById('btn-submit-auth');
+            const toggleText = document.getElementById('toggle-auth-text');
+            const errMsg = document.getElementById('error-msg');
+            const successMsg = document.getElementById('success-msg');
+
+            errMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+
+            if (isRegisterMode) {
+                title.innerText = "Đăng Ký Thành Viên";
+                desc.innerText = "Tạo tài khoản mới để tham gia làm bài tập";
+                btn.innerText = "Đăng Ký Tài Khoản";
+                toggleText.innerHTML = `Đã có tài khoản? <span onclick="window.switchAuthMode(false)">Đăng nhập tại đây</span>`;
+            } else {
+                title.innerText = "Hệ Thống Lớp 9A1";
+                desc.innerText = "Vui lòng đăng nhập để làm bài tập";
+                btn.innerText = "Đăng Nhập";
+                toggleText.innerHTML = `Chưa có tài khoản? <span onclick="window.switchAuthMode(true)">Đăng ký ngay</span>`;
+            }
+        }
+
+        window.handleSubmitAuth = function() {
+            const emailInp = document.getElementById('user-email').value.trim();
+            const passInp = document.getElementById('user-password').value;
+            const errMsg = document.getElementById('error-msg');
+            const successMsg = document.getElementById('success-msg');
+
+            errMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+
+            if (!emailInp || !passInp) {
+                errMsg.innerText = "Vui lòng nhập đầy đủ thông tin!";
+                errMsg.style.display = 'block';
+                return;
+            }
+
+            if (isRegisterMode) {
+                if(emailInp.toLowerCase() === TEACHER_EMAIL) {
+                    errMsg.innerText = "Không thể đăng ký tài khoản admin giáo viên thủ công!";
+                    errMsg.style.display = 'block';
+                    return;
+                }
+                createUserWithEmailAndPassword(auth, emailInp, passInp)
+                    .then((userCredential) => {
+                        successMsg.style.display = 'block';
+                        window.switchAuthMode(false);
+                        document.getElementById('user-password').value = "";
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                        if(error.code === 'auth/email-already-in-use') {
+                            errMsg.innerText = "Email này đã được đăng ký trước đó!";
+                        } else if (error.code === 'auth/weak-password') {
+                            errMsg.innerText = "Mật khẩu quá yếu (Tối thiểu 6 ký tự)!";
+                        } else {
+                            errMsg.innerText = "Lỗi đăng ký: " + error.message;
+                        }
+                        errMsg.style.display = 'block';
+                    });
+            } else {
+                signInWithEmailAndPassword(auth, emailInp, passInp)
+                    .then((userCredential) => {
+                        document.getElementById('auth-screen').style.display = 'none';
+                        
+                        // KIỂM TRA ĐĂNG NHẬP LÀ GIÁO VIÊN HAY HỌC SINH
+                        if (userCredential.user.email.toLowerCase() === TEACHER_EMAIL) {
+                            document.getElementById('teacher-screen').style.display = 'flex';
+                            document.getElementById('teacher-display').innerText = "Tài khoản: " + userCredential.user.email;
+                            window.loadSubmissions(); // Tải bảng kết quả luôn
+                        } else {
+                            document.getElementById('quiz-screen').style.display = 'flex';
+                            document.getElementById('user-display').innerText = "Học sinh: " + userCredential.user.email;
+                            initQuiz();
+                        }
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                        errMsg.innerText = "Sai tài khoản hoặc mật khẩu!";
+                        errMsg.style.display = 'block';
+                    });
+            }
+        }
+
+        // --- HÀM TẢI KẾT QUẢ TỪ FIREBASE CHO GIÁO VIÊN ---
+        window.loadSubmissions = async function() {
+            const tableBody = document.getElementById('submissions-table-body');
+            tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #888;">Đang làm mới dữ liệu...</td></tr>`;
+            
+            try {
+                // Sắp xếp bài nộp mới nhất lên đầu
+                const q = query(collection(db, "submissions"), orderBy("submittedAt", "desc"));
+                const querySnapshot = await getDocs(q);
+                
+                if(querySnapshot.empty) {
+                    tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #888;">Chưa có học sinh nào nộp bài.</td></tr>`;
+                    return;
+                }
+                
+                tableBody.innerHTML = "";
+                let stt = 1;
+                
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const docId = docSnap.id; // Lấy ID tài liệu để phục vụ việc xóa
+                    const date = data.submittedAt ? new Date(data.submittedAt).toLocaleString('vi-VN') : 'Không rõ';
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${stt++}</td>
+                        <td style="font-weight: 600;">${data.studentEmail || 'Ẩn danh'}</td>
+                        <td>${data.correctCount || '0/40'}</td>
+                        <td><span class="score-badge">${data.score !== undefined ? data.score.toFixed(2) : '0.00'}</span></td>
+                        <td style="color: #666; font-size: 13px;">${date}</td>
+                        <td><button class="btn-delete" onclick="window.deleteSubmission('${docId}', '${data.studentEmail}')">Xóa</button></td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error(error);
+                tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #d93025;">Lỗi lấy dữ liệu: ${error.message}</td></tr>`;
+            }
+        }
+
+        // --- HÀM XÓA BÀI LÀM CỦA HỌC SINH DÀNH CHO GIÁO VIÊN ---
+        window.deleteSubmission = async function(docId, studentEmail) {
+            if (!confirm(`Bạn có chắc chắn muốn xóa vĩnh viễn kết quả làm bài của học sinh: ${studentEmail}?`)) {
+                return;
+            }
+
+            try {
+                // Thực hiện xóa tài liệu trên Firestore dựa trên ID
+                await deleteDoc(doc(db, "submissions", docId));
+                alert(`Đã xóa thành công kết quả của ${studentEmail}!`);
+                window.loadSubmissions(); // Tải lại bảng kết quả sau khi xóa thành công
+            } catch (error) {
+                console.error(error);
+                alert("Lỗi không thể xóa kết quả: " + error.message);
+            }
+        }
+
+        function initQuiz() {
+            document.getElementById('quiz-title').innerText = quizData.title;
+            const qContainer = document.getElementById('questions-container');
+            const navGrid = document.getElementById('nav-grid');
+            
+            qContainer.innerHTML = "";
+            navGrid.innerHTML = "";
+
+            quizData.questions.forEach((q) => {
+                const qCard = document.createElement('div');
+                qCard.className = 'question-card';
+                qCard.id = `q-card-${q.num}`;
+                
+                let optionsHtml = '';
+                q.options.forEach((opt, index) => {
+                    const label = String.fromCharCode(65 + index);
+                    optionsHtml += `
+                        <label class="option-item">
+                            <input type="radio" name="question-${q.num}" value="${opt}" onchange="window.selectAnswer(${q.num}, '${opt}')">
+                            <strong>${label}.</strong> ${opt}
+                        </label>
+                    `;
+                });
+
+                qCard.innerHTML = `
+                    <span class="category-tag">${q.category}</span>
+                    <div class="question-text">Câu ${q.num}: ${q.questionText}</div>
+                    <div class="options-list">${optionsHtml}</div>
+                `;
+                qContainer.appendChild(qCard);
+
+                const navItem = document.createElement('div');
+                navItem.className = 'nav-item';
+                navItem.id = `nav-item-${q.num}`;
+                navItem.innerText = q.num;
+                navItem.onclick = () => {
+                    document.getElementById(`q-card-${q.num}`).scrollIntoView({ behavior: 'smooth' });
+                    document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active-card'));
+                    document.getElementById(`q-card-${q.num}`).classList.add('active-card');
+                };
+                navGrid.appendChild(navItem);
+            });
+
+            startTimer();
+        }
+
+        window.selectAnswer = function(qNum, value) {
+            studentAnswers[qNum] = value;
+            document.getElementById(`nav-item-${qNum}`).classList.add('answered');
+        }
+
+        function startTimer() {
+            const timerElement = document.getElementById('timer');
+            const countdown = setInterval(() => {
+                if (timeRemaining <= 0) {
+                    clearInterval(countdown);
+                    timerElement.innerText = "HẾT GIỜ!";
+                    window.submitQuiz(true);
+                } else {
+                    timeRemaining--;
+                    let mins = Math.floor(timeRemaining / 60);
+                    let secs = timeRemaining % 60;
+                    timerElement.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                }
+            }, 1000);
+        }
+
+        window.submitQuiz = async function(force = false) {
+            if (!force && Object.keys(studentAnswers).length < quizData.totalQuestions) {
+                if (!confirm("Bạn chưa làm hết 40 câu hỏi. Vẫn muốn nộp bài chứ?")) return;
+            }
+
+            let correctCount = 0;
+            for (let qNum in answerKeys) {
+                if (studentAnswers[qNum] === answerKeys[qNum]) correctCount++;
+            }
+
+            const score = (correctCount / quizData.totalQuestions) * 10;
+
+            try {
+                document.querySelector('.btn-submit').innerText = "Đang gửi bài lên Firebase...";
+                document.querySelector('.btn-submit').disabled = true;
+
+                await addDoc(collection(db, "submissions"), {
+                    studentEmail: auth.currentUser.email,
+                    score: parseFloat(score.toFixed(2)),
+                    correctCount: `${correctCount}/40`,
+                    answers: studentAnswers,
+                    submittedAt: new Date().toISOString()
+                });
+
+                document.getElementById('score-text').innerText = score.toFixed(2) + " Điểm";
+                document.getElementById('correct-count-text').innerText = `Hệ thống đã lưu kết quả thi của bạn thành công!`;
+                document.getElementById('result-modal').style.display = 'flex';
+
+            } catch (error) {
+                alert("Lỗi không thể lưu điểm: " + error.message);
+                document.querySelector('.btn-submit').innerText = "Nộp Bài Lên Firebase";
+                document.querySelector('.btn-submit').disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
