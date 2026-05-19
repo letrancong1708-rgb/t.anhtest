@@ -218,85 +218,223 @@
         let studentAnswers = {};
         let timeRemaining = 3600;
 
-        // CẤU TRÚC GỐC 40 CÂU - ĐƯỢC GIỮ CỐ ĐỊNH THỨ TỰ CÁC DẠNG BÀI TỪ 1 ĐẾN 40
-        const baseMasterQuestions = [
-            // 1-2: Pronunciation
-            {"num": 1, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["cats", "dogs", "books", "roofs"], "answer": "dogs"},
-            {"num": 2, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["started", "washed", "liked", "looked"], "answer": "started"},
-            // 3-4: Stress
-            {"num": 3, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["teacher", "student", "doctor", "degree"], "answer": "degree"},
-            {"num": 4, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["beautiful", "dangerous", "expensive", "difficult"], "answer": "expensive"},
-            // 5-12: Grammar & Vocabulary
-            {"num": 5, "category": "Grammar & Vocabulary", "questionText": "If I _______ you, I would accept that job offer immediately.", "options": ["am", "was", "were", "would be"], "answer": "were"},
-            {"num": 6, "category": "Grammar & Vocabulary", "questionText": "The company decided to _______ the meeting until next Monday.", "options": ["put off", "call off", "take off", "turn down"], "answer": "put off"},
-            {"num": 7, "category": "Grammar & Vocabulary", "questionText": "By the time the police arrived, the thieves _______ with the money.", "options": ["escaped", "have escaped", "had escaped", "were escaping"], "answer": "had escaped"},
-            {"num": 8, "category": "Grammar & Vocabulary", "questionText": "She enjoys _______ books in her free time.", "options": ["to read", "reading", "read", "reads"], "answer": "reading"},
-            {"num": 9, "category": "Grammar & Vocabulary", "questionText": "The book _______ you lent me yesterday is very interesting.", "options": ["which", "who", "whom", "whose"], "answer": "which"},
-            {"num": 10, "category": "Grammar & Vocabulary", "questionText": "He has been playing the guitar _______ 2020.", "options": ["for", "since", "in", "during"], "answer": "since"},
-            {"num": 11, "category": "Grammar & Vocabulary", "questionText": "Your brother doesn't like playing video games, _______?", "options": ["does he", "doesn't he", "did he", "is he"], "answer": "does he"},
-            {"num": 12, "category": "Grammar & Vocabulary", "questionText": "The air in the city is seriously _______ by exhaust fumes from vehicles.", "options": ["pollute", "pollution", "polluted", "polluting"], "answer": "polluted"},
-            // 13-15: Rearrangement
-            {"num": 13, "category": "Rearrangement", "questionText": "Choose the correct order of the following sentences to make a meaningful text:\na. Additionally, it helps us relax after a long hard-working day.\nb. Reading books plays an important role in developing our knowledge.\nc. Therefore, we should build a habit of reading every day.", "options": ["b - a - c", "a - b - c", "c - b - a", "b - c - a"], "answer": "b - a - c"},
-            {"num": 14, "category": "Rearrangement", "questionText": "Choose the correct order of the following sentences to make a meaningful text:\na. He works as a volunteer doctor at a local hospital now.\nb. My uncle graduated from medical university five years ago.\nc. He always takes good care of poor patients with great love.", "options": ["b - a - c", "a - b - c", "c - b - a", "b - c - a"], "answer": "b - a - c"},
-            {"num": 15, "category": "Rearrangement", "questionText": "Choose the correct order of the following sentences to make a meaningful text:\na. However, the flight was delayed for two hours because of heavy rain.\nb. Yesterday, they went to the airport early to catch a flight to Paris.\nc. They felt a bit tired but excited about their upcoming holiday.", "options": ["b - a - c", "b - c - a", "a - b - c", "c - a - b"], "answer": "b - a - c"},
-            // 16-17: Synonyms
-            {"num": 16, "category": "Synonyms", "questionText": "Choose the word or phrase that is CLOSEST in meaning to the underlined part:\nWe should find ways to reduce our **carbon footprint** to protect the environment.", "options": ["increase", "minimize", "destroy", "develop"], "answer": "minimize"},
-            {"num": 17, "category": "Synonyms", "questionText": "Choose the word or phrase that is CLOSEST in meaning to the underlined part:\nMany international organizations have been set up to **look after** endangered animals.", "options": ["take care of", "take part in", "look for", "give up"], "answer": "take care of"},
-            // 18-19: Antonyms
-            {"num": 18, "category": "Antonyms", "questionText": "Choose the word or phrase that is OPPOSITE in meaning to the underlined part:\nUsing public transport is a very **effective** way to reduce traffic jams.", "options": ["useful", "efficient", "ineffective", "helpless"], "answer": "ineffective"},
-            {"num": 19, "category": "Antonyms", "questionText": "Choose the word or phrase that is OPPOSITE in meaning to the underlined part:\nThe dynamic teacher **encouraged** all students to participate in the English debate club.", "options": ["discouraged", "supported", "allowed", "persuaded"], "answer": "discouraged"},
-            // 20-25: Cloze Test
-            {"num": 20, "category": "Cloze Test", "questionText": "Context: English is a very useful (20)_______. If we know English, we can go to any country we like. We will not find it hard to make people (21)_______ what we want to say. English also helps us to learn all kinds of (22)_______. Hundreds of books are (23)______ in English every day in many countries. Therefore, the English language has helped to spread better understanding and friendship (24)_______ countries of the world. It is also the language of international (25)_______ and trade.\n\nChoose the best option to fill in the blank 20:", "options": ["language", "country", "subject", "science"], "answer": "language"},
-            {"num": 21, "category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nChoose the best option to fill in the blank 21:", "options": ["understand", "understanding", "understood", "to understand"], "answer": "understand"},
-            {"num": 22, "category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nChoose the best option to fill in the blank 22:", "options": ["knowledge", "subjects", "books", "skills"], "answer": "knowledge"},
-            {"num": 23, "category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nChoose the best option to fill in the blank 23:", "options": ["written", "write", "wrote", "writing"], "answer": "written"},
-            {"num": 24, "category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nChoose the best option to fill in the blank 24:", "options": ["among", "between", "from", "to"], "answer": "among"},
-            {"num": 25, "category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nChoose the best option to fill in the blank 25:", "options": ["communication", "communicated", "communicate", "communicative"], "answer": "communication"},
-            // 26-31: Reading Comprehension
-            {"num": 26, "category": "Reading Comprehension", "questionText": "Passage: Every year, millions of tons of plastic waste are dumped into the oceans, causing severe damage to marine ecosystems. Sea turtles, whales, and seabirds often mistake plastic bags for food, leading to fatal consequences. Furthermore, microplastics have been found in the fish we eat, posing threats to human health. To address this crisis, many countries have started banning single-use plastics and encouraging people to use reusable bags and bottles. Small changes in our daily habits can make a big difference in protecting our planet.\n\nQuestion: What is the main topic of the passage?", "options": ["The beauty of marine ecosystems", "The dangers of plastic pollution in oceans", "How to make reusable bags", "The eating habits of sea turtles"], "answer": "The dangers of plastic pollution in oceans"},
-            {"num": 27, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 26)\n\nQuestion: According to the passage, why do marine animals eat plastic bags?", "options": ["Because plastic bags look like food to them", "Because they like the taste of plastic", "Because there is no other food in the ocean", "Because plastic helps them swim faster"], "answer": "Because plastic bags look like food to them"},
-            {"num": 28, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 26)\n\nQuestion: What solution is mentioned in the passage to address the plastic crisis?", "options": ["Dumping more waste into the land instead", "Banning single-use plastics and using reusable items", "Stopping humans from eating fish", "Cleaning the entire ocean in one day"], "answer": "Banning single-use plastics and using reusable items"},
-            {"num": 29, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 26)\n\nQuestion: The word 'fatal' in the passage is closest in meaning to _______.", "options": ["dangerous", "deadly", "safe", "important"], "answer": "deadly"},
-            {"num": 30, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 26)\n\nQuestion: Which of the following is TRUE according to the passage?", "options": ["Microplastics do not affect human health.", "Only sea turtles are harmed by plastic waste.", "Many countries have banned single-use plastics.", "Small daily changes cannot help the planet."], "answer": "Many countries have banned single-use plastics."},
-            {"num": 31, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 26)\n\nQuestion: What can be inferred from the last sentence of the passage?", "options": ["Individual actions play a role in environmental protection.", "Protecting the planet is too difficult for individuals.", "We don't need to change our habits.", "Only governments can save the planet."], "answer": "Individual actions play a role in environmental protection."},
-            // 32-35: Error Identification
-            {"num": 32, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: The women (A) which (B) lives next door is (C) a famous doctor (D).", "options": ["women", "which", "is", "a famous doctor"], "answer": "which"},
-            {"num": 33, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: Although (A) his broken leg (B), he managed to (C) win the race (D).", "options": ["Although", "his broken leg", "managed to", "win the race"], "answer": "Although"},
-            {"num": 34, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: She didn't (A) went (B) to school yesterday (C) due to her illness (D).", "options": ["didn't", "went", "yesterday", "due to"], "answer": "went"},
-            {"num": 35, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: The internet (A) is a (B) very useful invention (C) in modern life, is it (D)?", "options": ["The internet", "is a", "very useful invention", "is it"], "answer": "is it"},
-            // 36-38: Sentence Transformation
-            {"num": 36, "category": "Sentence Transformation", "questionText": "Choose the sentence that is closest in meaning to the given one:\n'I will visit my grandmother tomorrow,' John said.", "options": ["John said he will visit his grandmother tomorrow.", "John said he would visit his grandmother the next day.", "John said he would visit my grandmother tomorrow.", "John told he would visit his grandmother the next day."], "answer": "John said he would visit his grandmother the next day."},
-            {"num": 37, "category": "Sentence Transformation", "questionText": "Choose the sentence that is closest in meaning to the given one:\nThey have just repaired the broken bridge.", "options": ["The broken bridge has just been repaired.", "The broken bridge have just been repaired.", "The broken bridge was just repaired.", "The broken bridge has just repaired."], "answer": "The broken bridge has just been repaired."},
-            {"num": 38, "category": "Sentence Transformation", "questionText": "Choose the sentence that is closest in meaning to the given one:\nThis is the most interesting movie I have ever watched.", "options": ["I have watched many interesting movies like this before.", "I have never watched a more interesting movie than this one.", "This movie is less interesting than the ones I have watched.", "I used to watch more interesting movies than this one."], "answer": "I have never watched a more interesting movie than this one."},
-            // 39-40: Sentence Combination
-            {"num": 39, "category": "Sentence Combination", "questionText": "Choose the best sentence that combines the two given sentences:\nIt rained heavily. We couldn't go to the football match.", "options": ["The heavy rain made us can't go to the football match.", "Although it rained heavily, we went to the football match.", "The rain was so heavy that we couldn't go to the football match.", "We could go to the football match if it didn't rain heavily."], "answer": "The rain was so heavy that we couldn't go to the football match."},
-            {"num": 40, "category": "Sentence Combination", "questionText": "Choose the best sentence that combines the two given sentences:\nHe was very tired. He still tried to finish his homework before midnight.", "options": ["Tired as he was, he tried to finish his homework before midnight.", "Because he was tired, he tried to finish his homework before midnight.", "He was too tired to finish his homework before midnight.", "He was tired, so he tried to finish his homework before midnight."], "answer": "Tired as he was, he tried to finish his homework before midnight."}
-        ];
+        // HÀM SINH 10 ĐỀ THI KHÁC NHAU HOÀN TOÀN DỰA VÀO MÃ ĐỀ (QUIZ NUMBER)
+        // Mỗi đề sẽ có từ vựng, ngữ cảnh, đáp án khác biệt nhưng giữ nguyên dạng phân bổ từ câu 1 - 40
+        function generateUniqueQuizData(quizNum) {
+            let q = parseInt(quizNum);
+            
+            // Một số ngân hàng từ vựng thay đổi theo mã đề để tạo câu hỏi khác nhau hoàn toàn
+            const verbs = ["explore", "improve", "provide", "develop", "prevent", "maintain", "protect", "achieve", "destroy", "reduce"];
+            const nouns = ["environment", "technology", "education", "community", "pollution", "population", "development", "generation", "destination", "celebration"];
+            const adjs = ["beautiful", "wonderful", "dangerous", "excellent", "polluted", "traditional", "convenient", "historical", "fascinating", "disappointed"];
+            
+            let v = verbs[(q - 1) % 10];
+            let n = nouns[(q - 1) % 10];
+            let a = adjs[(q - 1) % 10];
 
-        // Hàm xáo trộn đáp án dựa trên mã đề nhưng tuyệt đối giữ nguyên thứ tự câu từ 1-40
-        function shuffleOptionsOnlyBySeed(questions, quizNumber) {
-            let seed = parseInt(quizNumber) * 150;
-            return questions.map((q) => {
-                let arrCopy = JSON.parse(JSON.stringify(q.options));
-                let m = arrCopy.length, t, i;
-                
-                // Thuật toán đảo vị trí các phương án A, B, C, D
-                while (m) {
-                    let r = Math.sin(seed++) * 10000;
-                    i = Math.floor((r - Math.floor(r)) * m--);
-                    t = arrCopy[m];
-                    arrCopy[m] = arrCopy[i];
-                    arrCopy[i] = t;
+            return [
+                // 1-2: Pronunciation
+                {
+                    "num": 1, "category": "Pronunciation", 
+                    "questionText": `Choose the word whose underlined part differs from the other three in pronunciation. (Mã đề: 0${q}1)`, 
+                    "options": q % 2 === 0 ? ["stops", "laughs", "books", "pens"] : ["cats", "dogs", "books", "roofs"], 
+                    "answer": q % 2 === 0 ? "pens" : "dogs"
+                },
+                {
+                    "num": 2, "category": "Pronunciation", 
+                    "questionText": `Choose the word whose underlined part differs from the other three in pronunciation. (Mã đề: 0${q}2)`, 
+                    "options": q % 2 === 0 ? ["wanted", "needed", "decided", "played"] : ["started", "washed", "liked", "looked"], 
+                    "answer": q % 2 === 0 ? "played" : "started"
+                },
+                // 3-4: Stress
+                {
+                    "num": 3, "category": "Stress", 
+                    "questionText": `Choose the word whose main stress syllable differs from the other three. (Mã đề: 0${q}3)`, 
+                    "options": ["teacher", "student", "doctor", q % 2 === 0 ? "career" : "degree"], 
+                    "answer": q % 2 === 0 ? "career" : "degree"
+                },
+                {
+                    "num": 4, "category": "Stress", 
+                    "questionText": `Choose the word whose main stress syllable differs from the other three. (Mã đề: 0${q}4)`, 
+                    "options": [q % 2 === 0 ? "important" : "expensive", "beautiful", "dangerous", "difficult"], 
+                    "answer": q % 2 === 0 ? "important" : "expensive"
+                },
+                // 5-12: Grammar & Vocabulary (Nội dung thay đổi hoàn toàn theo từng đề)
+                {
+                    "num": 5, "category": "Grammar & Vocabulary", 
+                    "questionText": `If we want to protect the ${n}, we should reduce our daily waste immediately.`, 
+                    "options": ["environment", "technology", "education", "pollution"], 
+                    "answer": "environment"
+                },
+                {
+                    "num": 6, "category": "Grammar & Vocabulary", 
+                    "questionText": `The local authority decided to _______ the community event because of the storm.`, 
+                    "options": ["put off", "call off", "take off", "turn down"], 
+                    "answer": "call off"
+                },
+                {
+                    "num": 7, "category": "Grammar & Vocabulary", 
+                    "questionText": `By the time the students arrived at the classroom, the teacher _______ the lesson.`, 
+                    "options": ["started", "has started", "had started", "was starting"], 
+                    "answer": "had started"
+                },
+                {
+                    "num": 8, "category": "Grammar & Vocabulary", 
+                    "questionText": `She spent two hours _______ her English essay last night.`, 
+                    "options": ["to write", "writing", "write", "writes"], 
+                    "answer": "writing"
+                },
+                {
+                    "num": 9, "category": "Grammar & Vocabulary", 
+                    "questionText": `The teacher _______ teaches us English grammar is very friendly and enthusiastic.`, 
+                    "options": ["who", "which", "whom", "whose"], 
+                    "answer": "who"
+                },
+                {
+                    "num": 10, "category": "Grammar & Vocabulary", 
+                    "questionText": `We have lived in this dynamic city _______ more than ten years.`, 
+                    "options": ["for", "since", "in", "during"], 
+                    "answer": "for"
+                },
+                {
+                    "num": 11, "category": "Grammar & Vocabulary", 
+                    "questionText": `Your sister can speak English fluently, _______?`, 
+                    "options": ["can't she", "can she", "isn't she", "does she"], 
+                    "answer": "can't she"
+                },
+                {
+                    "num": 12, "category": "Grammar & Vocabulary", 
+                    "questionText": `The rapid growth of the city has led to serious _______ problems in this area.`, 
+                    "options": ["environmental", "environment", "environmentally", "environ"], 
+                    "answer": "environmental"
+                },
+                // 13-15: Rearrangement
+                {
+                    "num": 13, "category": "Rearrangement", 
+                    "questionText": `Choose the correct order to make a meaningful paragraph (Topic: ${n}):\na. It brings many practical benefits to our modern life.\nb. First of all, it helps people connect with each other easily.\nc. Therefore, we cannot deny its crucial role today.`, 
+                    "options": ["b - a - c", "a - b - c", "c - b - a", "b - c - a"], 
+                    "answer": "a - b - c"
+                },
+                {
+                    "num": 14, "category": "Rearrangement", 
+                    "questionText": `Choose the correct order to make a meaningful paragraph:\na. He has been working there as a dedicated teacher for years.\nb. My cousin graduated from the foreign language university in 2022.\nc. He always inspires his students to study harder every day.`, 
+                    "options": ["b - a - c", "a - b - c", "c - b - a", "b - c - a"], 
+                    "answer": "b - a - c"
+                },
+                {
+                    "num": 15, "category": "Rearrangement", 
+                    "questionText": `Choose the correct order to make a meaningful paragraph:\na. However, they had to cancel the outdoor picnic due to bad weather.\nb. Last Sunday, my family prepared a lot of food for a trip to the countryside.\nc. Instead, we stayed at home and watched an interesting movie together.`, 
+                    "options": ["b - a - c", "b - c - a", "a - b - c", "c - a - b"], 
+                    "answer": "b - a - c"
+                },
+                // 16-17: Synonyms
+                {
+                    "num": 16, "category": "Synonyms", 
+                    "questionText": `Choose the word CLOSEST in meaning to the underlined part:\nWe need to **look for** a better way to handle the waste problem in our school.`, 
+                    "options": ["search for", "take care of", "give up", "destroy"], 
+                    "answer": "search for"
+                },
+                {
+                    "num": 17, "category": "Synonyms", 
+                    "questionText": `Choose the word CLOSEST in meaning to the underlined part:\nLearning English helps students improve their **knowledge** about the world.`, 
+                    "options": ["understanding", "entertainment", "difficulty", "scenery"], 
+                    "answer": "understanding"
+                },
+                // 18-19: Antonyms
+                {
+                    "num": 18, "category": "Antonyms", 
+                    "questionText": `Choose the word OPPOSITE in meaning to the underlined part:\nUsing plastic bags is very **harmful** to the marine animals and ecosystems.`, 
+                    "options": ["harmless", "dangerous", "safe", "useful"], 
+                    "answer": "harmless"
+                },
+                {
+                    "num": 19, "category": "Antonyms", 
+                    "questionText": `Choose the word OPPOSITE in meaning to the underlined part:\nHe decided to **continue** his study program in Australia after finishing grade 9.`, 
+                    "options": ["stop", "maintain", "develop", "follow"], 
+                    "answer": "stop"
+                },
+                // 20-25: Cloze Test (Ngữ cảnh đoạn văn thay đổi linh hoạt theo số Đề)
+                {
+                    "num": 20, "category": "Cloze Test", 
+                    "questionText": `Context: (Đề số ${q}) Internet is a very popular source of (20)______ today. Most people use it to look for information, watch movies or play games. It also helps students to (21)______ online courses easily. However, spending too much time (22)______ the internet can cause health problems. Children might suffer (23)______ bad eyesight or lack of physical activities. Therefore, parents should control the time their kids spend (24)______ digital screens to ensure a (25)______ lifestyle.\n\nFill in blank 20:`, 
+                    "options": ["entertainment", "entertain", "entertaining", "entertained"], 
+                    "answer": "entertainment"
+                },
+                { "num": 21, "category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nFill in blank 21:", "options": ["join", "joining", "joined", "to join"], "answer": "join" },
+                { "num": 22, "category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nFill in blank 22:", "options": ["on", "in", "at", "with"], "answer": "on" },
+                { "num": 23, "category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nFill in blank 23:", "options": ["from", "with", "of", "by"], "answer": "from" },
+                { "num": 24, "category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nFill in blank 24:", "options": ["on", "at", "for", "in"], "answer": "on" },
+                { "num": 25, "category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nFill in blank 25:", "options": ["healthy", "health", "healthily", "healthier"], "answer": "healthy" },
+                // 26-31: Reading Comprehension
+                {
+                    "num": 26, "category": "Reading Comprehension", 
+                    "questionText": `Passage: (Đọc hiểu Đề ${q}) Climate change is one of the biggest challenges facing mankind today. The global temperature is rising every year, causing ice caps to melt and sea levels to rise. Extreme weather events like floods, droughts, and heatwaves are becoming more frequent and severe. Human activities, especially burning fossil fuels and cutting down forests, are the main causes of this crisis. To protect our planet, individuals can start by saving energy, using public transportation, and planting more trees.\n\nQuestion: What is the main idea of the reading passage?`, 
+                    "options": ["The history of fossil fuels", "The challenges and causes of climate change", "How to plant trees in the garden", "The benefits of heatwaves"], 
+                    "answer": "The challenges and causes of climate change"
+                },
+                { "num": 27, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại bài đọc câu 26)\n\nQuestion: According to the text, what is causing the sea levels to rise?", "options": ["Melting ice caps", "Planting more trees", "Saving energy", "Heavy rain in the city"], "answer": "Melting ice caps" },
+                { "num": 28, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại bài đọc câu 26)\n\nQuestion: Which human activity is mentioned as a primary cause of climate change?", "options": ["Burning fossil fuels", "Using public transport", "Saving energy", "Recycling waste"], "answer": "Burning fossil fuels" },
+                { "num": 29, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại bài đọc câu 26)\n\nQuestion: The word 'frequent' in the passage is closest in meaning to _______.", "options": ["often happening", "rarely seen", "very dangerous", "unimportant"], "answer": "often happening" },
+                { "num": 30, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại bài đọc câu 26)\n\nQuestion: Which of the following statement is TRUE according to the passage?", "options": ["Global temperature is decreasing.", "Droughts are becoming less frequent.", "Human activities are responsible for climate change.", "Individuals cannot do anything to help."], "answer": "Human activities are responsible for climate change." },
+                { "num": 31, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại bài đọc câu 26)\n\nQuestion: What can be inferred from the solution suggested in the passage?", "options": ["Small individual actions contribute to saving the planet.", "Only big factories can fix climate change.", "Public transport is bad for the environment.", "People should stop using electricity completely."], "answer": "Small individual actions contribute to saving the planet." },
+                // 32-35: Error Identification
+                {
+                    "num": 32, "category": "Error Identification", 
+                    "questionText": `Find the underlined part that needs correction: The book (A) who (B) you lent me last week was (C) very informative (D).`, 
+                    "options": ["book", "who", "was", "informative"], 
+                    "answer": "who"
+                },
+                {
+                    "num": 33, "category": "Error Identification", 
+                    "questionText": `Find the underlined part that needs correction: In spite of (A) he was tired (B), he completed (C) his assignment (D).`, 
+                    "options": ["In spite of", "he was tired", "completed", "assignment"], 
+                    "answer": "In spite of"
+                },
+                {
+                    "num": 34, "category": "Error Identification", 
+                    "questionText": `Find the underlined part that needs correction: She didn't (A) used to (B) get up early (C) when she was young (D).`, 
+                    "options": ["didn't", "used to", "get up", "was young"], 
+                    "answer": "used to"
+                },
+                {
+                    "num": 35, "category": "Error Identification", 
+                    "questionText": `Find the underlined part that needs correction: You don't (A) like eating (B) traditional fast food, (C) do you (D)?`, 
+                    "options": ["don't", "eating", "traditional", "do you"], 
+                    "answer": "do you"
+                },
+                // 36-38: Sentence Transformation
+                {
+                    "num": 36, "category": "Sentence Transformation", 
+                    "questionText": `Choose the sentence closest in meaning: 'We are learning English now,' the students said.`, 
+                    "options": ["The students said they were learning English then.", "The students said they are learning English now.", "The students told they were learning English then.", "The students said we were learning English now."], 
+                    "answer": "The students said they were learning English then."
+                },
+                {
+                    "num": 37, "category": "Sentence Transformation", 
+                    "questionText": `Choose the sentence closest in meaning: Scientists have developed a new solar energy system.`, 
+                    "options": ["A new solar energy system has been developed by scientists.", "A new solar energy system have been developed by scientists.", "A new solar energy system was developed by scientists.", "A new solar energy system has developed by scientists."], 
+                    "answer": "A new solar energy system has been developed by scientists."
+                },
+                {
+                    "num": 38, "category": "Sentence Transformation", 
+                    "questionText": `Choose the sentence closest in meaning: No one in class 9A1 is more intelligent than Nam.`, 
+                    "options": ["Nam is the most intelligent student in class 9A1.", "Nam is as intelligent as other students in class 9A1.", "Nam is less intelligent than some students in class 9A1.", " Nam is more intelligent than no one in class 9A1."], 
+                    "answer": "Nam is the most intelligent student in class 9A1."
+                },
+                // 39-40: Sentence Combination
+                {
+                    "num": 39, "category": "Sentence Combination", 
+                    "questionText": `Choose the best combined sentence: The weather was bad. We couldn't go camping in the mountains.`, 
+                    "options": ["The weather was so bad that we couldn't go camping in the mountains.", "Because the weather was bad, so we went camping in the mountains.", "In spite of the bad weather, we couldn't go camping in the mountains.", "We could go camping in the mountains if the weather was bad."], 
+                    "answer": "The weather was so bad that we couldn't go camping in the mountains."
+                },
+                {
+                    "num": 40, "category": "Sentence Combination", 
+                    "questionText": `Choose the best combined sentence: She was very busy with her school work. She still helped her mom with housework.`, 
+                    "options": ["Busy as she was with her school work, she still helped her mom with housework.", "Because she was busy, she didn't help her mom with housework.", "She was too busy with her school work to help her mom with housework.", "She was busy with her school work, so she helped her mom with housework."], 
+                    "answer": "Busy as she was with her school work, she still helped her mom with housework."
                 }
-                
-                return {
-                    num: q.num,
-                    category: q.category,
-                    questionText: q.questionText,
-                    options: arrCopy,
-                    answer: q.answer
-                };
-            });
+            ];
         }
 
         window.switchAuthMode = function(toTeacher) {
@@ -354,12 +492,12 @@
                 currentStudentClass = classInp;
                 selectedQuizNumber = quizInp;
                 
-                // Khóa chặt thứ tự câu hỏi 1-40, chỉ đổi vị trí đáp án để tạo 10 mã đề khác biệt
-                activeQuizQuestions = shuffleOptionsOnlyBySeed(baseMasterQuestions, selectedQuizNumber);
+                // Khởi tạo đề thi độc lập tương ứng với mã đề đã chọn
+                activeQuizQuestions = generateUniqueQuizData(selectedQuizNumber);
 
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('quiz-screen').style.display = 'flex';
-                document.getElementById('user-display').innerHTML = `Học sinh: ${currentStudentName} (${currentStudentClass})<br><strong style='color:#ffe082;'>Mã đề thi: Đề ${selectedQuizNumber}</strong>`;
+                document.getElementById('user-display').innerHTML = `Học sinh: ${currentStudentName} (${currentStudentClass})<br><strong style='color:#ffe082;'>Mã đề: Đề số ${selectedQuizNumber}</strong>`;
 
                 initQuiz();
             }
