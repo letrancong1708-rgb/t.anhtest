@@ -800,7 +800,7 @@ let quizData;
 let answerKeys;
 
         let studentAnswers = {};
-        let timeRemaining = quizData.duration * 60;
+        let timeRemaining = 0;
 
         window.switchAuthMode = function(toTeacher) {
             isTeacherMode = toTeacher;
@@ -908,6 +908,7 @@ let answerKeys;
                 
                 quizData = allQuizzes[selectedQuizIndex];
                 answerKeys = allAnswerKeys[selectedQuizIndex];
+                timeRemaining = quizData.duration * 60;
 
                 initQuiz();
             }
