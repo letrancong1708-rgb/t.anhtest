@@ -104,6 +104,21 @@
                         <option value="9A4">Lớp 9A4</option>
                     </select>
                 </div>
+                <div class="form-group">
+                    <label>Chọn đề thi</label>
+                    <select id="quiz-select">
+                        <option value="0">Đề 1</option>
+                        <option value="1">Đề 2</option>
+                        <option value="2">Đề 3</option>
+                        <option value="3">Đề 4</option>
+                        <option value="4">Đề 5</option>
+                        <option value="5">Đề 6</option>
+                        <option value="6">Đề 7</option>
+                        <option value="7">Đề 8</option>
+                        <option value="8">Đề 9</option>
+                        <option value="9">Đề 10</option>
+                    </select>
+                </div>
             </div>
             
             <button class="btn-auth" id="btn-submit-auth" onclick="handleAuthAction()">Bắt Đầu Làm Bài</button>
@@ -158,6 +173,7 @@
                             <th>STT</th>
                             <th>Tên Học Sinh</th>
                             <th>Lớp</th>
+                            <th>Đề Thi</th>
                             <th>Số Câu Đúng</th>
                             <th>Điểm Số</th>
                             <th>Thời Gian Nộp Bài</th>
@@ -166,7 +182,7 @@
                     </thead>
                     <tbody id="submissions-table-body">
                         <tr>
-                            <td colspan="7" style="text-align: center; color: #888;">Đang tải danh sách học sinh nộp bài...</td>
+                            <td colspan="8" style="text-align: center; color: #888;">Đang tải danh sách học sinh nộp bài...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -209,70 +225,579 @@
         let isTeacherMode = false;
         let currentStudentName = "";
         let currentStudentClass = "";
+        let selectedQuizIndex = 0;
 
-        const quizData = {
-            "title": "Đề Khảo Sát Chất Lượng Tiếng Anh 9 - Cấu Trúc Mới",
-            "duration": 60,
-            "totalQuestions": 40,
-            "questions": [
-                {"num": 1, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["cats", "dogs", "books", "roofs"]},
-                {"num": 2, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["started", "washed", "liked", "looked"]},
-                {"num": 3, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["teacher", "student", "doctor", "degree"]},
-                {"num": 4, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["beautiful", "dangerous", "expensive", "difficult"]},
-                {"num": 5, "category": "Grammar & Vocabulary", "questionText": "If I _______ you, I would accept that job offer immediately.", "options": ["am", "was", "were", "would be"]},
-                {"num": 6, "category": "Grammar & Vocabulary", "questionText": "The company decided to _______ the meeting until next Monday.", "options": ["put off", "call off", "take off", "turn down"]},
-                {"num": 7, "category": "Grammar & Vocabulary", "questionText": "By the time the police arrived, the thieves _______ with the money.", "options": ["escaped", "have escaped", "had escaped", "were escaping"]},
-                {"num": 8, "category": "Grammar & Vocabulary", "questionText": "She enjoys _______ books in her free time.", "options": ["to read", "reading", "read", "reads"]},
-                {"num": 9, "category": "Grammar & Vocabulary", "questionText": "The book _______ you lent me yesterday is very interesting.", "options": ["which", "who", "whom", "whose"]},
-                {"num": 10, "category": "Grammar & Vocabulary", "questionText": "He has been playing the guitar _______ 2020.", "options": ["for", "since", "in", "during"]},
-                {"num": 11, "category": "Grammar & Vocabulary", "questionText": "Your brother doesn't like playing video games, _______?", "options": ["does he", "doesn't he", "did he", "is he"]},
-                {"num": 12, "category": "Grammar & Vocabulary", "questionText": "The air in the city is seriously _______ by exhaust fumes from vehicles.", "options": ["pollute", "pollution", "polluted", "polluting"]},
-                {"num": 13, "category": "Rearrangement", "questionText": "Choose the correct order of the following sentences to make a meaningful text:\na. Additionally, it helps us relax after a long hard-working day.\nb. Reading books plays an important role in developing our knowledge.\nc. Therefore, we should build a habit of reading every day.", "options": ["b - a - c", "a - b - c", "c - b - a", "b - c - a"]},
-                {"num": 14, "category": "Rearrangement", "questionText": "Choose the correct order of the following sentences to make a meaningful text:\na. He works as a volunteer doctor at a local hospital now.\nb. My uncle graduated from medical university five years ago.\nc. He always takes good care of poor patients with great love.", "options": ["b - a - c", "a - b - c", "c - b - a", "b - c - a"]},
-                {"num": 15, "category": "Rearrangement", "questionText": "Choose the correct order of the following sentences to make a meaningful text:\na. However, the flight was delayed for two hours because of heavy rain.\nb. Yesterday, they went to the airport early to catch a flight to Paris.\nc. They felt a bit tired but excited about their upcoming holiday.", "options": ["b - a - c", "b - c - a", "a - b - c", "c - a - b"]},
-                {"num": 16, "category": "Synonyms", "questionText": "Choose the word or phrase that is CLOSEST in meaning to the underlined part:\nWe should find ways to reduce our **carbon footprint** to protect the environment.", "options": ["increase", "minimize", "destroy", "develop"]},
-                {"num": 17, "category": "Synonyms", "questionText": "Choose the word or phrase that is CLOSEST in meaning to the underlined part:\nMany international organizations have been set up to **look after** endangered animals.", "options": ["take care of", "take part in", "look for", "give up"]},
-                {"num": 18, "category": "Antonyms", "questionText": "Choose the word or phrase that is OPPOSITE in meaning to the underlined part:\nUsing public transport is a very **effective** way to reduce traffic jams.", "options": ["useful", "efficient", "ineffective", "helpless"]},
-                {"num": 19, "category": "Antonyms", "questionText": "Choose the word or phrase that is OPPOSITE in meaning to the underlined part:\nThe dynamic teacher **encouraged** all students to participate in the English debate club.", "options": ["discouraged", "supported", "allowed", "persuaded"]},
-                {"num": 20, "category": "Cloze Test", "questionText": "Context: English is a very useful (20)_______. If we know English, we can go to any country we like. We will not find it hard to make people (21)_______ what we want to say. English also helps us to learn all kinds of (22)_______. Hundreds of books are (23)______ in English every day in many countries. Therefore, the English language has helped to spread better understanding and friendship (24)_______ countries of the world. It is also the language of international (25)_______ and trade.\n\nChoose the best option to fill in the blank 20:", "options": ["language", "country", "subject", "science"]},
-                {"num": 21, "category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nChoose the best option to fill in the blank 21:", "options": ["understand", "understanding", "understood", "to understand"]},
-                {"num": 22, "category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nChoose the best option to fill in the blank 22:", "options": ["knowledge", "subjects", "books", "skills"]},
-                {"num": 23, "category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nChoose the best option to fill in the blank 23:", "options": ["written", "write", "wrote", "writing"]},
-                {"num": 24, "category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nChoose the best option to fill in the blank 24:", "options": ["among", "between", "from", "to"]},
-                {"num": 25, "category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nChoose the best option to fill in the blank 25:", "options": ["communication", "communicated", "communicate", "communicative"]},
-                {"num": 26, "category": "Reading Comprehension", "questionText": "Passage: Every year, millions of tons of plastic waste are dumped into the oceans, causing severe damage to marine ecosystems. Sea turtles, whales, and seabirds often mistake plastic bags for food, leading to fatal consequences. Furthermore, microplastics have been found in the fish we eat, posing threats to human health. To address this crisis, many countries have started banning single-use plastics and encouraging people to use reusable bags and bottles. Small changes in our daily habits can make a big difference in protecting our planet.\n\nQuestion: What is the main topic of the passage?", "options": ["The beauty of marine ecosystems", "The dangers of plastic pollution in oceans", "How to make reusable bags", "The eating habits of sea turtles"]},
-                {"num": 27, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 26)\n\nQuestion: According to the passage, why do marine animals eat plastic bags?", "options": ["Because plastic bags look like food to them", "Because they like the taste of plastic", "Because there is no other food in the ocean", "Because plastic helps them swim faster"]},
-                {"num": 28, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 26)\n\nQuestion: What solution is mentioned in the passage to address the plastic crisis?", "options": ["Dumping more waste into the land instead", "Banning single-use plastics and using reusable items", "Stopping humans from eating fish", "Cleaning the entire ocean in one day"]},
-                {"num": 29, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 26)\n\nQuestion: The word 'fatal' in the passage is closest in meaning to _______.", "options": ["dangerous", "deadly", "safe", "important"]},
-                {"num": 30, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 26)\n\nQuestion: Which of the following is TRUE according to the passage?", "options": ["Microplastics do not affect human health.", "Only sea turtles are harmed by plastic waste.", "Many countries have banned single-use plastics.", "Small daily changes cannot help the planet."]},
-                {"num": 31, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 26)\n\nQuestion: What can be inferred from the last sentence of the passage?", "options": ["Individual actions play a role in environmental protection.", "Protecting the planet is too difficult for individuals.", "We don't need to change our habits.", "Only governments can save the planet."]},
-                {"num": 32, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: The women (A) which (B) lives next door is (C) a famous doctor (D).", "options": ["women", "which", "is", "a famous doctor"]},
-                {"num": 33, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: Although (A) his broken leg (B), he managed to (C) win the race (D).", "options": ["Although", "his broken leg", "managed to", "win the race"]},
-                {"num": 34, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: She didn't (A) went (B) to school yesterday (C) due to her illness (D).", "options": ["didn't", "went", "yesterday", "due to"]},
-                {"num": 35, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: The internet (A) is a (B) very useful invention (C) in modern life, is it (D)?", "options": ["The internet", "is a", "very useful invention", "is it"]},
-                {"num": 36, "category": "Sentence Transformation", "questionText": "Choose the sentence that is closest in meaning to the given one:\n'I will visit my grandmother tomorrow,' John said.", "options": ["John said he will visit his grandmother tomorrow.", "John said he would visit his grandmother the next day.", "John said he would visit my grandmother tomorrow.", "John told he would visit his grandmother the next day."]},
-                {"num": 37, "category": "Sentence Transformation", "questionText": "Choose the sentence that is closest in meaning to the given one:\nThey have just repaired the broken bridge.", "options": ["The broken bridge has just been repaired.", "The broken bridge have just been repaired.", "The broken bridge was just repaired.", "The broken bridge has just repaired."]},
-                {"num": 38, "category": "Sentence Transformation", "questionText": "Choose the sentence that is closest in meaning to the given one:\nThis is the most interesting movie I have ever watched.", "options": ["I have watched many interesting movies like this before.", "I have never watched a more interesting movie than this one.", "This movie is less interesting than the ones I have watched.", "I used to watch more interesting movies than this one."]},
-                {"num": 39, "category": "Sentence Combination", "questionText": "Choose the best sentence that combines the two given sentences:\nIt rained heavily. We couldn't go to the football match.", "options": ["The heavy rain made us can't go to the football match.", "Although it rained heavily, we went to the football match.", "The rain was so heavy that we couldn't go to the football match.", "We could go to the football match if it didn't rain heavily."]},
-                {"num": 40, "category": "Sentence Combination", "questionText": "Choose the best sentence that combines the two given sentences:\nHe was very tired. He still tried to finish his homework before midnight.", "options": ["Tired as he was, he tried to finish his homework before midnight.", "Because he was tired, he tried to finish his homework before midnight.", "He was too tired to finish his homework before midnight.", "He was tired, so he tried to finish his homework before midnight."]}
-            ]
-        };
+        const allQuizzes = [
 
-        const answerKeys = {
-            "1": "dogs", "2": "started", "3": "degree", "4": "expensive", "5": "were", 
-            "6": "put off", "7": "had escaped", "8": "reading", "9": "which", "10": "since", 
-            "11": "does he", "12": "polluted", "13": "b - a - c", "14": "b - a - c", "15": "b - a - c", 
-            "16": "minimize", "17": "take care of", "18": "ineffective", "19": "discouraged", "20": "language", 
-            "21": "understand", "22": "knowledge", "23": "written", "24": "among", "25": "communication", 
-            "26": "The dangers of plastic pollution in oceans", "27": "Because plastic bags look like food to them", 
-            "28": "Banning single-use plastics and using reusable items", "29": "deadly", 
-            "30": "Many countries have banned single-use plastics.", "31": "Individual actions play a role in environmental protection.", 
-            "32": "which", "33": "Although", "34": "went", "35": "is it", 
-            "36": "John said he would visit his grandmother the next day.", "37": "The broken bridge has just been repaired.", 
-            "38": "I have never watched a more interesting movie than this one.", 
-            "39": "The rain was so heavy that we couldn't go to the football match.", 
-            "40": "Tired as he was, he tried to finish his homework before midnight."
-        };
+{
+    title: "Đề Tiếng Anh 9 - Đề 1",
+    duration: 60,
+    totalQuestions: 40,
+    questions: [
+        {"num": 1, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["maps", "clocks", "beds", "hats"]},
+    {"num": 2, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["decided", "played", "listened", "stayed"]},
+    {"num": 3, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["rice", "nice", "life", "live"]},
+    {"num": 4, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["brother", "weather", "think", "there"]},
+    {"num": 5, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["pencil", "ruler", "career", "paper"]},
+    {"num": 6, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["wonderful", "terrible", "important", "different"]},
+    {"num": 7, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["allow", "listen", "open", "answer"]},
+    {"num": 8, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["population", "disappointment", "environment", "entertainment"]},
+    {"num": 9, "category": "Grammar & Vocabulary", "questionText": "If she studied harder, she _______ the graduation exam.", "options": ["will pass", "would pass", "passes", "passed"]},
+    {"num": 10, "category": "Grammar & Vocabulary", "questionText": "We had to _______ the football match because of the heavy rain.", "options": ["call off", "put on", "turn up", "look after"]},
+    {"num": 11, "category": "Grammar & Vocabulary", "questionText": "When I came home, my mother _______ dinner in the kitchen.", "options": ["is cooking", "cooked", "was cooking", "has cooked"]},
+    {"num": 12, "category": "Grammar & Vocabulary", "questionText": "They suggest _______ to the beach this weekend.", "options": ["go", "to go", "going", "goes"]},
+    {"num": 13, "category": "Grammar & Vocabulary", "questionText": "The girl _______ sat next to me on the bus was very friendly.", "options": ["which", "whom", "who", "whose"]},
+    {"num": 14, "category": "Grammar & Vocabulary", "questionText": "We have lived in this city _______ ten years.", "options": ["since", "for", "in", "at"]},
+    {"num": 15, "category": "Grammar & Vocabulary", "questionText": "You don't like drinking coffee, _______?", "options": ["do you", "don't you", "are you", "did you"]},
+    {"num": 16, "category": "Grammar & Vocabulary", "questionText": "The party was _______ organized, so everyone had a great time.", "options": ["good", "well", "bad", "badly"]},
+    {"num": 17, "category": "Grammar & Vocabulary", "questionText": "If the weather _______ fine tomorrow, we will go camping.", "options": ["is", "will be", "was", "were"]},
+    {"num": 18, "category": "Grammar & Vocabulary", "questionText": "This smartphone is _______ than that one.", "options": ["expensive", "more expensive", "most expensive", "as expensive"]},
+    {"num": 19, "category": "Grammar & Vocabulary", "questionText": "My parents dynamic interested in _______ new historical places.", "options": ["visit", "visiting", "to visit", "visited"]},
+    {"num": 20, "category": "Grammar & Vocabulary", "questionText": "A new school _______ in our neighborhood next month.", "options": ["will build", "will be built", "is building", "built"]},
+    {"num": 21, "category": "Grammar & Vocabulary", "questionText": "The laptop _______ I bought last week works perfectly.", "options": ["who", "whom", "which", "whose"]},
+    {"num": 22, "category": "Grammar & Vocabulary", "questionText": "I wish I _______ more time to travel around Vietnam right now.", "options": ["have", "had", "will have", "would have"]},
+    {"num": 23, "category": "Grammar & Vocabulary", "questionText": "_______ he was tired, he tried his best to finish the homework.", "options": ["Because", "Although", "Despite", "In spite of"]},
+    {"num": 24, "category": "Grammar & Vocabulary", "questionText": "Remember to _______ the lights before leaving the classroom.", "options": ["turn off", "turn on", "look for", "fill in"]},
+    {"num": 25, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: The boy (A) which (B) won the first prize is (C) my classmate (D).", "options": ["The boy", "which", "is", "my classmate"]},
+    {"num": 26, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: In spite of (A) it rained (B) heavily, they went (C) to the concert (D).", "options": ["In spite of", "it rained", "went", "to the concert"]},
+    {"num": 27, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: My father (A) enjoys (B) to watch (C) football on TV (D).", "options": ["My father", "enjoys", "to watch", "football"]},
+    {"num": 28, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: She has (A) learned English (B) for (C) 2018 (D).", "options": ["has", "learned", "for", "2018"]},
+    {"num": 29, "category": "Cloze Test", "questionText": "Context: Computers are very important in the (29)_______ world. They can help us store a large amount of information. Millions of people use computers for their (30)_______ every day. Children enjoy playing games on computers, but they shouldn't spend too much time (31)_______ them. If they sit in front of the screen for hours, it can be harmful (32)_______ their eyes. Therefore, we should use this useful (33)_______ wisely.\n\nChoose the best option for blank 29:", "options": ["modern", "old", "ancient", "past"]},
+    {"num": 30, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 30:", "options": ["work", "worker", "working", "worked"]},
+    {"num": 31, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 31:", "options": ["on", "at", "with", "in"]},
+    {"num": 32, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 32:", "options": ["to", "for", "with", "about"]},
+    {"num": 33, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 33:", "options": ["invention", "inventor", "invent", "invented"]},
+    {"num": 34, "category": "Reading Comprehension", "questionText": "Passage: Tet holiday is the most important festival in Vietnam. It usually takes place from late January to early February. Before Tet, Vietnamese people clean and decorate their houses with peach blossoms or apricot blossoms. They also cook traditional foods such as Banh Chung. During Tet, people visit their relatives, teachers, and friends. Children are very excited because they receive lucky money inside red envelopes.\n\nQuestion: When does Tet holiday usually happen?", "options": ["In December", "From late January to early February", "In late February", "In early January"]},
+    {"num": 35, "category": "Reading Comprehension", "questionText": "Passage: (Same passage as above)\n\nQuestion: What do people do to their houses before Tet?", "options": ["They sell them", "They paint them black", "They clean and decorate them", "They rebuild them"]},
+    {"num": 36, "category": "Reading Comprehension", "questionText": "Passage: (Same passage as above)\n\nQuestion: Why are children excited during Tet?", "options": ["Because they don't have to eat", "Because they receive lucky money", "Because they can buy new cars", "Because they go to school"]},
+    {"num": 37, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: 'I am going to Hanoi next week,' Nam said.", "options": ["Nam said he is going to Hanoi next week.", "Nam said he was going to Hanoi the following week.", "Nam said I was going to Hanoi next week.", "Nam told he was going to Hanoi next week."]},
+    {"num": 38, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: They built this bridge in 2020.", "options": ["This bridge was built in 2020.", "This bridge is built in 2020.", "This bridge has been built in 2020.", "This bridge was build in 2020."]},
+    {"num": 39, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: Because of his laziness, he failed the exam.", "options": ["Because he was lazy, he failed the exam.", "Although he was lazy, he passed the exam.", "He was lazy, but he passed the exam.", "He failed the exam though he was diligent."]},
+    {"num": 40, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: I have never read a more interesting story than this one.", "options": ["This is the most interesting story I have ever read.", "This story is less interesting than others.", "I used to read more interesting stories.", "I have read this story many times."]}
+    ]
+},
+
+{
+    title: "Đề Tiếng Anh 9 - Đề 2",
+    duration: 60,
+    totalQuestions: 40,
+    questions: [
+    {"num": 1, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["laughs", "keeps", "cleaners", "months"]},
+    {"num": 2, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["invited", "wanted", "needed", "worked"]},
+    {"num": 3, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["great", "beautiful", "peaceful", "cheap"]},
+    {"num": 4, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["chemistry", "children", "church", "chair"]},
+    {"num": 5, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["window", "kitchen", "hotel", "bedroom"]},
+    {"num": 6, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["confident", "polluted", "natural", "excellent"]},
+    {"num": 7, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["destroy", "provide", "receive", "visit"]},
+    {"num": 8, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["possibility", "nationality", "recommendation", "satisfaction"]},
+    {"num": 9, "category": "Grammar & Vocabulary", "questionText": "If we protect the environment, we _______ a better life.", "options": ["will have", "would have", "had", "have had"]},
+    {"num": 10, "category": "Grammar & Vocabulary", "questionText": "She turned _______ the job offer because the salary was too low.", "options": ["down", "up", "on", "off"]},
+    {"num": 11, "category": "Grammar & Vocabulary", "questionText": "They _______ each other since they left school in 2022.", "options": ["haven't seen", "didn't see", "don't see", "hadn't seen"]},
+    {"num": 12, "category": "Grammar & Vocabulary", "questionText": "It is difficult for us _______ this grammar exercise.", "options": ["understand", "to understand", "understanding", "understood"]},
+    {"num": 13, "category": "Grammar & Vocabulary", "questionText": "Do you know the woman _______ son won the championship?", "options": ["who", "whom", "which", "whose"]},
+    {"num": 14, "category": "Grammar & Vocabulary", "questionText": "The meeting will start _______ 8:00 AM tomorrow.", "options": ["on", "at", "in", "for"]},
+    {"num": 15, "category": "Grammar & Vocabulary", "questionText": "Your sister can speak French fluently, _______?", "options": ["can't she", "can she", "does she", "isn't she"]},
+    {"num": 16, "category": "Grammar & Vocabulary", "questionText": "Plastic bags are non-biodegradable, so they cause environmental _______.", "options": ["pollute", "pollution", "polluted", "polluting"]},
+    {"num": 17, "category": "Grammar & Vocabulary", "questionText": "If he _______ free time, he would join our club.", "options": ["has", "had", "will have", "would have"]},
+    {"num": 18, "category": "Grammar & Vocabulary", "questionText": "No one in my class is _______ than Linh.", "options": ["intelligent", "more intelligent", "most intelligent", "as intelligent"]},
+    {"num": 19, "category": "Grammar & Vocabulary", "questionText": "We are looking forward to _______ from you soon.", "options": ["hear", "hearing", "to hear", "heard"]},
+    {"num": 20, "category": "Grammar & Vocabulary", "questionText": "Rice _______ in many tropical countries.", "options": ["grows", "is grown", "is growing", "has grown"]},
+    {"num": 21, "category": "Grammar & Vocabulary", "questionText": "The man _______ helped us yesterday was very generous.", "options": ["who", "which", "whom", "whose"]},
+    {"num": 22, "category": "Grammar & Vocabulary", "questionText": "The boy wishes he _______ a pilot in the future.", "options": ["is", "was", "will be", "could be"]},
+    {"num": 23, "category": "Grammar & Vocabulary", "questionText": "They didn't go out for a walk _______ the heavy rain.", "options": ["because", "although", "because of", "despite"]},
+    {"num": 24, "category": "Grammar & Vocabulary", "questionText": "Please _______ the radio. It's too loud.", "options": ["turn down", "turn up", "turn on", "look for"]},
+    {"num": 25, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: The book (A) who (B) I bought (C) yesterday is fantastic (D).", "options": ["The book", "who", "bought", "fantastic"]},
+    {"num": 26, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: Despite (A) he was tired (B), he finished (C) his project (D).", "options": ["Despite", "he was tired", "finished", "his project"]},
+    {"num": 27, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: He stopped (A) smoke (B) because it was (C) bad for his health (D).", "options": ["stopped", "smoke", "because", "bad for"]},
+    {"num": 28, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: You (A) haven't finished (B) your assignment (C), have you (D)?", "options": ["You", "haven't finished", "assignment", "have you"]},
+    {"num": 29, "category": "Cloze Test", "questionText": "Context: Water is essential for all living things. We cannot survive (29)_______ water for more than a few days. However, fresh water resources are (30)_______ because of pollution and waste. Many rivers and lakes have been heavily polluted by industrial waste. We must save water and reduce pollution to (31)_______ our planet. Simple actions like turning off the tap while brushing teeth can help (32)_______ water. Let's act together for a (33)_______ future.\n\nChoose the best option for blank 29:", "options": ["without", "with", "for", "by"]},
+    {"num": 30, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 30:", "options": ["limited", "limitation", "limit", "limiting"]},
+    {"num": 31, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 31:", "options": ["protect", "pollute", "destroy", "waste"]},
+    {"num": 32, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 32:", "options": ["save", "spend", "throw", "make"]},
+    {"num": 33, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 33:", "options": ["better", "worse", "bad", "difficult"]},
+    {"num": 34, "category": "Reading Comprehension", "questionText": "Passage: Solar energy is a clean and renewable source of energy. It comes from the sun and can be turned into electricity using solar panels. Unlike coal or oil, solar energy does not cause air pollution or greenhouse gas emissions. Many households are now installing solar systems on their roofs to save money on electricity bills and protect the environment.\n\nQuestion: Where does solar energy come from?", "options": ["The wind", "The sun", "Coal", "Water"]},
+    {"num": 35, "category": "Reading Comprehension", "questionText": "Passage: (Same passage as above)\n\nQuestion: What is a major advantage of solar energy over coal?", "options": ["It is more expensive", "It causes air pollution", "It does not cause air pollution", "It runs out quickly"]},
+    {"num": 36, "category": "Reading Comprehension", "questionText": "Passage: (Same passage as above)\n\nQuestion: Why do households install solar panels on their roofs?", "options": ["To make their houses heavier", "To save money on electricity bills", "To block the sunlight", "To catch birds"]},
+    {"num": 37, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: 'I will buy a new laptop tomorrow,' Lan said.", "options": ["Lan said she would buy a new laptop the next day.", "Lan said she will buy a new laptop tomorrow.", "Lan said I would buy a new laptop tomorrow.", "Lan told she will buy a new laptop the next day."]},
+    {"num": 38, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: They clean the classroom every morning.", "options": ["The classroom is cleaned every morning.", "The classroom was cleaned every morning.", "The classroom has been cleaned every morning.", "The classroom is cleaning every morning."]},
+    {"num": 39, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: Although the test was difficult, he got a high score.", "options": ["In spite of the difficult test, he got a high score.", "Because the test was difficult, he got a high score.", "Despite the test was difficult, he got a high score.", "The test was difficult so he got a high score."]},
+    {"num": 40, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: This is the most beautiful city I have ever visited.", "options": ["I have never visited a more beautiful city than this one.", "I visited a beautiful city like this before.", "This city is less beautiful than others.", "I used to visit more beautiful cities."]}
+  ]
+},
+
+{
+    title: "Đề Tiếng Anh 9 - Đề 3",
+    duration: 60,
+    totalQuestions: 40,
+    questions: [
+    {"num": 1, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["books", "cups", "hands", "hats"]},
+    {"num": 2, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["watched", "stopped", "pushed", "needed"]},
+    {"num": 3, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["find", "mind", "window", "kind"]},
+    {"num": 4, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["school", "scholar", "chef", "chemistry"]},
+    {"num": 5, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["table", "report", "chair", "sofa"]},
+    {"num": 6, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["terrific", "historic", "economic", "fantastic"]},
+    {"num": 7, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["invite", "offer", "provide", "accept"]},
+    {"num": 8, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["organization", "pronunciation", "consideration", "responsibility"]},
+    {"num": 9, "category": "Grammar & Vocabulary", "questionText": "If I had enough money, I _______ that beautiful house.", "options": ["will buy", "bought", "would buy", "buy"]},
+    {"num": 10, "category": "Grammar & Vocabulary", "questionText": "Don't forget to _______ your shoes when you enter the Japanese house.", "options": ["take off", "put on", "turn off", "look for"]},
+    {"num": 11, "category": "Grammar & Vocabulary", "questionText": "While my father was reading books, my sister _______ with her dolls.", "options": ["plays", "was playing", "played", "is playing"]},
+    {"num": 12, "category": "Grammar & Vocabulary", "questionText": "She avoided _______ to that crowded supermarket.", "options": ["go", "going", "to go", "goes"]},
+    {"num": 13, "category": "Grammar & Vocabulary", "questionText": "The house _______ walls are green belongs to Mr. Brown.", "options": ["which", "who", "whose", "that"]},
+    {"num": 14, "category": "Grammar & Vocabulary", "questionText": "We usually have a short holiday _______ summer.", "options": ["on", "at", "in", "for"]},
+    {"num": 15, "category": "Grammar & Vocabulary", "questionText": "They haven't done their homework yet, _______?", "options": ["have they", "haven't they", "did they", "do they"]},
+    {"num": 16, "category": "Grammar & Vocabulary", "questionText": "The internet is a very useful tool, but it can be _______ if abused.", "options": ["harm", "harmful", "harmless", "harmfully"]},
+    {"num": 17, "category": "Grammar & Vocabulary", "questionText": "If it _______ heavily, the street will be flooded.", "options": ["rains", "will rain", "rained", "is raining"]},
+    {"num": 18, "category": "Grammar & Vocabulary", "questionText": "This problem is _______ than the one we solved yesterday.", "options": ["easy", "easier", "more easy", "easiest"]},
+    {"num": 19, "category": "Grammar & Vocabulary", "questionText": "They decided _______ a new community library.", "options": ["build", "building", "to build", "built"]},
+    {"num": 20, "category": "Grammar & Vocabulary", "questionText": "English _______ all over the world nowadays.", "options": ["speaks", "is spoken", "is speaking", "was spoken"]},
+    {"num": 21, "category": "Grammar & Vocabulary", "questionText": "The car _______ my father bought last month is very energy-saving.", "options": ["which", "who", "whom", "whose"]},
+    {"num": 22, "category": "Grammar & Vocabulary", "questionText": "He wishes he _______ go to the party with his friends tonight.", "options": ["can", "could", "will", "would"]},
+    {"num": 23, "category": "Grammar & Vocabulary", "questionText": "They went to the stadium early _______ get a good seat.", "options": ["in order to", "so that", "because", "although"]},
+    {"num": 24, "category": "Grammar & Vocabulary", "questionText": "You should _______ this form before taking the test.", "options": ["fill in", "turn up", "look after", "go off"]},
+    {"num": 25, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: The building (A) who (B) was destroyed (C) in the storm was old (D).", "options": ["The building", "who", "was destroyed", "old"]},
+    {"num": 26, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: Because of (A) the heavy rain (B), we decided to going (C) out (D).", "options": ["Because of", "heavy rain", "going", "out"]},
+    {"num": 27, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: He is (A) the most tallest (B) boy in (C) my class (D).", "options": ["is", "most tallest", "in", "my class"]},
+    {"num": 28, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: She says (A) that she (B) will visit (C) us yesterday (D).", "options": ["says", "that", "will visit", "yesterday"]},
+    {"num": 29, "category": "Cloze Test", "questionText": "Context: Reading is one of the best habits a person can develop. Books open up a whole new (29)_______ of knowledge and imagination. When you read, you can learn about different (30)_______ and histories without traveling. Reading also helps to improve your vocabulary and language (31)_______. Educators suggest that children should read at least 20 minutes (32)_______ day to improve their academic performance. It's time to pick up a book and (33)_______ reading!\n\nChoose the best option for blank 29:", "options": ["world", "earth", "planet", "country"]},
+    {"num": 30, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 30:", "options": ["cultures", "cultural", "culturally", "culture"]},
+    {"num": 31, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 31:", "options": ["skills", "tools", "machines", "instruments"]},
+    {"num": 32, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 32:", "options": ["a", "an", "the", "some"]},
+    {"num": 33, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 33:", "options": ["start", "stop", "finish", "avoid"]},
+    {"num": 34, "category": "Reading Comprehension", "questionText": "Passage: Forests play a crucial role in maintaining global climate balance. They act as the planet's lungs by absorbing carbon dioxide and releasing oxygen. Millions of species of plants and animals call forests their home. Deforestation, caused by cutting down trees for agriculture and wood, has led to severe habitat loss and accelerated global warming.\n\nQuestion: Why are forests called the planet's lungs?", "options": ["Because they are green", "Because they absorb carbon dioxide and release oxygen", "Because humans can breathe inside them", "Because they block the wind"]},
+    {"num": 35, "category": "Reading Comprehension", "questionText": "Passage: (Same passage as above)\n\nQuestion: What is a main cause of deforestation?", "options": ["Planting more trees", "Cutting down trees for agriculture and wood", "Protecting wild animals", "Global warming"]},
+    {"num": 36, "category": "Reading Comprehension", "questionText": "Passage: (Same passage as above)\n\nQuestion: What is an effect of deforestation mentioned in the text?", "options": ["More oxygen in the air", "Severe habitat loss", "Cooler global climate", "An increase in plant species"]},
+    {"num": 37, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: 'I have homework to do now,' Mary said.", "options": ["Mary said she had homework to do then.", "Mary said she has homework to do now.", "Mary said I had homework to do then.", "Mary told she has homework to do now."]},
+    {"num": 38, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: Shakespeare wrote this play.", "options": ["This play was written by Shakespeare.", "This play is written by Shakespeare.", "This play has been written by Shakespeare.", "This play wrote by Shakespeare."]},
+    {"num": 39, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: Despite his wealth, he lives a very simple life.", "options": ["Although he is wealthy, he lives a very simple life.", "Because he is wealthy, he lives a very simple life.", "He is wealthy, so he lives a very simple life.", "He lives a simple life in spite of he is wealthy."]},
+    {"num": 40, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: This is the most difficult problem I have ever met.", "options": ["I have never met a more difficult problem than this one.", "I met a difficult problem like this before.", "This problem is less difficult than others.", "I am used to solving difficult problems."]}
+  ]
+},
+
+{
+    title: "Đề Tiếng Anh 9 - Đề 4",
+    duration: 60,
+    totalQuestions: 40,
+    questions: [
+    {"num": 1, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["wishes", "matches", "clothes", "boxes"]},
+    {"num": 2, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["cooked", "danced", "cleaned", "walked"]},
+    {"num": 3, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["heavy", "ready", "head", "seat"]},
+    {"num": 4, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["hour", "house", "horse", "home"]},
+    {"num": 5, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["mother", "uncle", "advice", "sister"]},
+    {"num": 6, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["electric", "attractive", "creative", "excellent"]},
+    {"num": 7, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["depend", "happen", "listen", "borrow"]},
+    {"num": 8, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["scientific", "academic", "geographic", "political"]},
+    {"num": 9, "category": "Grammar & Vocabulary", "questionText": "If the sun shines, we _______ to the park.", "options": ["go", "will go", "would go", "went"]},
+    {"num": 10, "category": "Grammar & Vocabulary", "questionText": "She likes to look _______ her younger brother when her parents are away.", "options": ["after", "for", "at", "up"]},
+    {"num": 11, "category": "Grammar & Vocabulary", "questionText": "By the time we got to the theater, the film _______.", "options": ["started", "had started", "was starting", "has started"]},
+    {"num": 12, "category": "Grammar & Vocabulary", "questionText": "My sister practices _______ English every day.", "options": ["speak", "speaking", "to speak", "speaks"]},
+    {"num": 13, "category": "Grammar & Vocabulary", "questionText": "The town _______ I grew up is very peaceful.", "options": ["which", "where", "who", "when"]},
+    {"num": 14, "category": "Grammar & Vocabulary", "questionText": "The course will begin _______ October 15th.", "options": ["in", "on", "at", "since"]},
+    {"num": 15, "category": "Grammar & Vocabulary", "questionText": "He hasn't written to you for months, _______?", "options": ["has he", "haven't he", "did he", "does he"]},
+    {"num": 16, "category": "Grammar & Vocabulary", "questionText": "The operation was completely _______, and the patient recovered quickly.", "options": ["success", "successful", "successfully", "unsuccessful"]},
+    {"num": 17, "category": "Grammar & Vocabulary", "questionText": "If I _______ you, I would take part in that green campaign.", "options": ["was", "were", "am", "would be"]},
+    {"num": 18, "category": "Grammar & Vocabulary", "questionText": "He runs _______ than anyone else in the team.", "options": ["fast", "faster", "more fast", "fastest"]},
+    {"num": 19, "category": "Grammar & Vocabulary", "questionText": "The teacher expects us _______ all the assignments before Friday.", "options": ["finish", "finishing", "to finish", "finished"]},
+    {"num": 20, "category": "Grammar & Vocabulary", "questionText": "This computer _______ by my father yesterday.", "options": ["repaired", "was repaired", "has repaired", "is repaired"]},
+    {"num": 21, "category": "Grammar & Vocabulary", "questionText": "The woman _______ was singing on the stage is a famous pop star.", "options": ["who", "which", "whom", "whose"]},
+    {"num": 22, "category": "Grammar & Vocabulary", "questionText": "Linh wishes she _______ an opportunity to visit London next year.", "options": ["has", "had", "will have", "would have"]},
+    {"num": 23, "category": "Grammar & Vocabulary", "questionText": "They failed the match _______ their careful preparation.", "options": ["because", "although", "despite", "because of"]},
+    {"num": 24, "category": "Grammar & Vocabulary", "questionText": "Please _______ the TV. No one is watching it.", "options": ["turn off", "turn on", "turn up", "look for"]},
+    {"num": 25, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: The house (A) which (B) my uncle lives (C) there is beautiful (D).", "options": ["The house", "which", "lives", "beautiful"]},
+    {"num": 26, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: Because (A) the traffic jam (B), we arrived (C) late at the meeting (D).", "options": ["Because", "traffic jam", "arrived", "late"]},
+    {"num": 27, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: She didn't (A) found (B) her keys (C) anywhere (D).", "options": ["didn't", "found", "keys", "anywhere"]},
+    {"num": 28, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: He has (A) been working (B) here (C) since five years (D).", "options": ["has", "been working", "here", "since"]},
+    {"num": 29, "category": "Cloze Test", "questionText": "Context: Healthy living is becoming more popular. People are more careful about what they (29)_______ every day. They eat more vegetables and reduce fast food intake. Doing exercise (30)_______ is also important. It helps us stay fit and reduces stress. Getting enough sleep, about 7 to 8 hours a night, can give us energy for a new day. Small changes in your routine can make a (31)_______ lifestyle. Let's make healthy choices starting from (32)_______!\n\nChoose the best option for blank 29:", "options": ["eat", "drink", "cook", "buy"]},
+    {"num": 30, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 30:", "options": ["regularly", "regular", "regulate", "regulation"]},
+    {"num": 31, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 31:", "options": ["better", "worse", "worse", "difficult"]},
+    {"num": 32, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 32:", "options": ["today", "tomorrow", "yesterday", "tonight"]},
+    {"num": 33, "category": "Cloze Test", "questionText": "Context: (Same context as above - Missing 33 in text, map to general structural safety)\nChoose the best auxiliary option for healthy living habit:", "options": ["should", "mustn't", "can't", "won't"]},
+    {"num": 34, "category": "Reading Comprehension", "questionText": "Passage: The Great Wall of China is one of the world's greatest wonders. It was built over hundreds of years to protect the country from invaders. It stretches across thousands of kilometers of mountains and deserts. Today, millions of tourists from all over the world visit the Great Wall every year to admire its magnificent beauty.\n\nQuestion: Why was the Great Wall of China built?", "options": ["To attract tourists", "To protect the country from invaders", "To hold running races", "To separate rivers"]},
+    {"num": 35, "category": "Reading Comprehension", "questionText": "Passage: (Same passage as above)\n\nQuestion: Where does the Great Wall stretch across?", "options": ["Only across cities", "Mountains and deserts", "Under the ocean", "Through factories"]},
+    {"num": 36, "category": "Reading Comprehension", "questionText": "Passage: (Same passage as above)\n\nQuestion: Who visits the Great Wall today?", "options": ["Only local people", "Millions of tourists from all over the world", "No one", "Only builders"]},
+    {"num": 37, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: 'I can solve this puzzle,' Peter said.", "options": ["Peter said he could solve that puzzle.", "Peter said he can solve this puzzle.", "Peter said I could solve that puzzle.", "Peter told he can solve this puzzle."]},
+    {"num": 38, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: My mother made this cake.", "options": ["This cake was made by my mother.", "This cake is made by my mother.", "This cake has been made by my mother.", "This cake made by my mother."]},
+    {"num": 39, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: Because of the heavy snow, the flight was delayed.", "options": ["Because it snowed heavily, the flight was delayed.", "Although it snowed heavily, the flight was on time.", "The heavy snow made the flight couldn't delay.", "The flight was delayed despite the heavy snow."]},
+    {"num": 40, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: I have never seen a more beautiful painting than this.", "options": ["This is the most beautiful painting I have ever seen.", "This painting is less beautiful than others.", "I used to see more beautiful paintings.", "I have seen this painting many times."]}
+  ]
+},
+
+{
+    title: "Đề Tiếng Anh 9 - Đề 5",
+    duration: 60,
+    totalQuestions: 40,
+    questions: [
+    {"num": 1, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["plays", "works", "stops", "cooks"]},
+    {"num": 2, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["landed", "flooded", "waited", "saved"]},
+    {"num": 3, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["dream", "team", "bread", "cream"]},
+    {"num": 4, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["ghost", "ground", "game", "guitar"]},
+    {"num": 5, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["country", "village", "city", "police"]},
+    {"num": 6, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["traditional", "historical", "environmental", "industrial"]},
+    {"num": 7, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["reduce", "reuse", "recycle", "rubbish"]},
+    {"num": 8, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["university", "opportunity", "responsibility", "electricity"]},
+    {"num": 9, "category": "Grammar & Vocabulary", "questionText": "If we leave now, we _______ the train.", "options": ["catch", "will catch", "would catch", "caught"]},
+    {"num": 10, "category": "Grammar & Vocabulary", "questionText": "He look forward to _______ up with his old friends.", "options": ["meet", "meeting", "to meet", "met"]},
+    {"num": 11, "category": "Grammar & Vocabulary", "questionText": "They _______ a new bridge across the river recently.", "options": ["built", "have built", "are building", "had built"]},
+    {"num": 12, "category": "Grammar & Vocabulary", "questionText": "It is worth _______ this book because it is very informative.", "options": ["read", "reading", "to read", "reads"]},
+    {"num": 13, "category": "Grammar & Vocabulary", "questionText": "The woman _______ car was stolen reported it to the police.", "options": ["who", "whose", "whom", "which"]},
+    {"num": 14, "category": "Grammar & Vocabulary", "questionText": "He was born _______ 1999 in a small village.", "options": ["in", "on", "at", "for"]},
+    {"num": 15, "category": "Grammar & Vocabulary", "questionText": "She hasn't finished her presentation, _______?", "options": ["has she", "haven't she", "does she", "did she"]},
+    {"num": 16, "category": "Grammar & Vocabulary", "questionText": "The development of technology brings a lot of _______ to our lives.", "options": ["convenient", "convenience", "conveniently", "inconvenient"]},
+    {"num": 17, "category": "Grammar & Vocabulary", "questionText": "If he _______ more money, he would go on an international tour.", "options": ["has", "had", "will have", "would have"]},
+    {"num": 18, "category": "Grammar & Vocabulary", "questionText": "This building is _______ than that one over there.", "options": ["tall", "taller", "more tall", "tallest"]},
+    {"num": 19, "category": "Grammar & Vocabulary", "questionText": "The doctor advised him _______ smoking immediately.", "options": ["stop", "stopping", "to stop", "stopped"]},
+    {"num": 20, "category": "Grammar & Vocabulary", "questionText": "A new hospital _______ in this area since last year.", "options": ["built", "has been built", "was built", "is built"]},
+    {"num": 21, "category": "Grammar & Vocabulary", "questionText": "The boy _______ won the high school contest is my neighbor.", "options": ["who", "which", "whom", "whose"]},
+    {"num": 22, "category": "Grammar & Vocabulary", "questionText": "I wish I _______ visit my grandparents in the countryside next week.", "options": ["can", "could", "will", "would"]},
+    {"num": 23, "category": "Grammar & Vocabulary", "questionText": "They went to the beach _______ the cold weather.", "options": ["because", "although", "despite", "in spite"]},
+    {"num": 24, "category": "Grammar & Vocabulary", "questionText": "Could you please _______ the radio? It's too loud.", "options": ["turn off", "turn on", "look for", "go on"]},
+    {"num": 25, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: The teacher (A) who (B) taught us English (C) last year are (D) very kind.", "options": ["The teacher", "who", "taught", "are"]},
+    {"num": 26, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: Although (A) his illness (B), he went to school (C) yesterday (D).", "options": ["Although", "his illness", "went to school", "yesterday"]},
+    {"num": 27, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: They enjoy (A) to read (B) comic books (C) in their free time (D).", "options": ["enjoy", "to read", "comic books", "free time"]},
+    {"num": 28, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: She has (A) been working (B) for (C) this company since (D) 10 years.", "options": ["has", "been working", "for", "since"]},
+    {"num": 29, "category": "Cloze Test", "questionText": "Context: Tourism is an important industry in many countries. It brings a lot of money and creates jobs for (29)_______ people. When tourists visit a place, they spend money on hotels, food, and (30)_______. However, too many tourists can cause environmental (31)_______ and damage historical sites. Therefore, sustainable tourism is being encouraged to protect local cultures and ecosystems. Tourists should be (32)_______ when exploring new places.\n\nChoose the best option for blank 29:", "options": ["local", "foreign", "strange", "international"]},
+    {"num": 30, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 30:", "options": ["entertainment", "entertain", "entertained", "entertaining"]},
+    {"num": 31, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 31:", "options": ["pollution", "polluted", "pollute", "polluting"]},
+    {"num": 32, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 32:", "options": ["careful", "careless", "carelessly", "care"]},
+    {"num": 33, "category": "Cloze Test", "questionText": "Context: (Same context as above)\nChoose the best linking word for destination choice context:", "options": ["and", "but", "or", "so"]},
+    {"num": 34, "category": "Reading Comprehension", "questionText": "Passage: Mount Everest is the highest mountain in the world above sea level. It is located in the Himalayas on the border between Nepal and China. Every year, hundreds of climbers from all over the world attempt to climb to its summit. Climbing Everest is extremely dangerous due to the freezing weather, strong winds, and lack of oxygen.\n\nQuestion: Where is Mount Everest located?", "options": ["In the Andes", "In the Himalayas", "In the Alps", "In the Rocky Mountains"]},
+    {"num": 35, "category": "Reading Comprehension", "questionText": "Passage: (Same passage as above)\n\nQuestion: Why is climbing Mount Everest dangerous?", "options": ["Because of wild animals", "Freezing weather, strong winds, and lack of oxygen", "Because there are no tour guides", "Because it is too beautiful"]},
+    {"num": 36, "category": "Reading Comprehension", "questionText": "Passage: (Same passage as above)\n\nQuestion: Who attempts to climb Everest every year?", "options": ["Only local monks", "Hundreds of climbers from all over the world", "No one", "Only scientists"]},
+    {"num": 37, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: 'I am practicing piano now,' Tom said.", "options": ["Tom said he was practicing piano then.", "Tom said he is practicing piano now.", "Tom said I was practicing piano then.", "Tom told he is practicing piano then."]},
+    {"num": 38, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: Picasso painted this famous picture.", "options": ["This famous picture was painted by Picasso.", "This famous picture is painted by Picasso.", "This famous picture has been painted by Picasso.", "This famous picture painted by Picasso."]},
+    {"num": 39, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: Because of the dense fog, they canceled the match.", "options": ["Because the fog was dense, they canceled the match.", "Although the fog was dense, they played the match.", "The dense fog made the match couldn't cancel.", "They canceled the match despite the fog was dense."]},
+    {"num": 40, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: I have never tasted a more delicious food than this.", "options": ["This is the most delicious food I have ever tasted.", "This food is less delicious than others.", "I used to taste more delicious foods.", "I have tasted this food many times."]}
+  ]
+},
+
+{
+    title: "Đề Tiếng Anh 9 - Đề 6",
+    duration: 60,
+    totalQuestions: 40,
+    questions: [
+    {"num": 1, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["helps", "laughs", "cooks", "finds"]},
+    {"num": 2, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["arrived", "looked", "watched", "stopped"]},
+    {"num": 3, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["kite", "bite", "hit", "white"]},
+    {"num": 4, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["machine", "mechanic", "character", "christmas"]},
+    {"num": 5, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["famous", "happy", "careful", "alone"]},
+    {"num": 6, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["historical", "impossible", "fascinating", "continuous"]},
+    {"num": 7, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["forget", "remind", "cancel", "admit"]},
+    {"num": 8, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["industrialization", "qualification", "misunderstanding", "uncomfortableness"]},
+    {"num": 9, "category": "Grammar & Vocabulary", "questionText": "If it rains tomorrow, we _______ our plans.", "options": ["change", "will change", "would change", "changed"]},
+    {"num": 10, "category": "Grammar & Vocabulary", "questionText": "You should turn _______ the air conditioner when you leave.", "options": ["off", "on", "up", "down"]},
+    {"num": 11, "category": "Grammar & Vocabulary", "questionText": "She _______ English for 5 years before she went to London.", "options": ["learned", "has learned", "had learned", "was learning"]},
+    {"num": 12, "category": "Grammar & Vocabulary", "questionText": "We are interested in _______ traditional crafts.", "options": ["make", "making", "to make", "made"]},
+    {"num": 13, "category": "Grammar & Vocabulary", "questionText": "The laptop _______ is on the table is mine.", "options": ["who", "whom", "which", "whose"]},
+    {"num": 14, "category": "Grammar & Vocabulary", "questionText": "The train leaves exactly _______ 7 o'clock.", "options": ["at", "in", "on", "for"]},
+    {"num": 15, "category": "Grammar & Vocabulary", "questionText": "Your parents have arrived, _______?", "options": ["haven't they", "have they", "don't they", "did they"]},
+    {"num": 16, "category": "Grammar & Vocabulary", "questionText": "She is a _______ driver; she never has an accident.", "options": ["careful", "careless", "carefully", "carelessness"]},
+    {"num": 17, "category": "Grammar & Vocabulary", "questionText": "If I _______ you, I wouldn't buy that expensive phone.", "options": ["am", "was", "were", "would be"]},
+    {"num": 18, "category": "Grammar & Vocabulary", "questionText": "This task is _______ than the previous one.", "options": ["difficult", "more difficult", "most difficult", "as difficult"]},
+    {"num": 19, "category": "Grammar & Vocabulary", "questionText": "They plan _______ a new park in the neighborhood.", "options": ["build", "to build", "building", "built"]},
+    {"num": 20, "category": "Grammar & Vocabulary", "questionText": "The house _______ by the fire yesterday.", "options": ["destroyed", "was destroyed", "is destroyed", "has destroyed"]},
+    {"num": 21, "category": "Grammar & Vocabulary", "questionText": "The doctor _______ cured my grandfather was very friendly.", "options": ["who", "which", "whom", "whose"]},
+    {"num": 22, "category": "Grammar & Vocabulary", "questionText": "I wish I _______ speak many foreign languages.", "options": ["can", "could", "will", "would"]},
+    {"num": 23, "category": "Grammar & Vocabulary", "questionText": "They failed the exam _______ their laziness.", "options": ["because", "although", "because of", "despite"]},
+    {"num": 24, "category": "Grammar & Vocabulary", "questionText": "She had to look _______ her younger sister yesterday.", "options": ["after", "for", "at", "up"]},
+    {"num": 25, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: The man (A) which (B) told us the story (C) is a writer (D).", "options": ["The man", "which", "told", "writer"]},
+    {"num": 26, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: In spite of (A) the test was easy (B), he didn't (C) pass it (D).", "options": ["In spite of", "easy", "didn't", "pass"]},
+    {"num": 27, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: She didn't (A) went (B) to the party (C) last night (D).", "options": ["didn't", "went", "party", "last night"]},
+    {"num": 28, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: He has (A) lived here (B) since (C) five years (D).", "options": ["has", "lived here", "since", "five years"]},
+    {"num": 29, "category": "Cloze Test", "questionText": "Context: Pollution is a global problem. It affects our health and the (29)_______. There are many types of pollution, such as air pollution, water pollution, and noise pollution. Toxic gases from factories make the air (30)_______. Waste from households and industries causes water pollution. To reduce pollution, we should use public transport and (31)_______ more trees. Everyone should take responsibility for (32)_______ our planet.\n\nChoose the best option for blank 29:", "options": ["environment", "environmental", "environmentally", "environ"]},
+    {"num": 30, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 30:", "options": ["dirty", "clean", "fresh", "pure"]},
+    {"num": 31, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 31:", "options": ["plant", "cut", "burn", "destroy"]},
+    {"num": 32, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 32:", "options": ["protecting", "protect", "protected", "protection"]},
+    {"num": 33, "category": "Cloze Test", "questionText": "Context: (Same context as above)\nChoose the best modal to express social duty:", "options": ["should", "mustn't", "can't", "won't"]},
+    {"num": 34, "category": "Reading Comprehension", "questionText": "Passage: Plastic pollution is damaging our oceans. Every year, millions of tons of plastic enter the sea. Marine animals like turtles often mistake plastic bags for jellyfish and eat them. This causes them to become sick or die. Governments are trying to ban single-use plastic items to solve this problem.\n\nQuestion: What is damaging our oceans according to the text?", "options": ["Plastic pollution", "Global warming", "Overfishing", "Oil spills"]},
+    {"num": 35, "category": "Reading Comprehension", "questionText": "Passage: (Same passage as above)\n\nQuestion: What do turtles mistake plastic bags for?", "options": ["Fish", "Jellyfish", "Seaweed", "Crabs"]},
+    {"num": 36, "category": "Reading Comprehension", "questionText": "Passage: (Same passage as above)\n\nQuestion: What are governments trying to do?", "options": ["Ban single-use plastic items", "Catch more turtles", "Clean the entire beach", "Build more factories"]},
+    {"num": 37, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: 'I will help you tomorrow,' John said to me.", "options": ["John told me he would help me the next day.", "John said me he will help me tomorrow.", "John told me I would help him tomorrow.", "John said he would help me tomorrow."]},
+    {"num": 38, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: They have built a new school near my house.", "options": ["A new school has been built near my house.", "A new school have been built near my house.", "A new school was built near my house.", "A new school has built near my house."]},
+    {"num": 39, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: Because of his hard work, he passed the exam.", "options": ["Because he worked hard, he passed the exam.", "Although he worked hard, he passed the exam.", "He didn't pass the exam because he worked hard.", "He worked hard so that he would fail the exam."]},
+    {"num": 40, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: This is the most interesting movie I have ever watched.", "options": ["I have never watched a more interesting movie than this one.", "This movie is as interesting as others.", "I used to watch more interesting movies.", "I have watched this movie before."]}
+  ]
+},
+
+{
+    title: "Đề Tiếng Anh 9 - Đề 7",
+    duration: 60,
+    totalQuestions: 40,
+    questions: [
+    {"num": 1, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["cats", "dogs", "books", "shops"]},
+    {"num": 2, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["wanted", "needed", "decided", "played"]},
+    {"num": 3, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["time", "line", "sit", "five"]},
+    {"num": 4, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["this", "that", "thin", "them"]},
+    {"num": 5, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["student", "teacher", "doctor", "advice"]},
+    {"num": 6, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["beautiful", "wonderful", "expensive", "dangerous"]},
+    {"num": 7, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["agree", "refuse", "borrow", "decide"]},
+    {"num": 8, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["information", "education", "communication", "preparation"]},
+    {"num": 9, "category": "Grammar & Vocabulary", "questionText": "If I find your keys, I _______ you.", "options": ["call", "will call", "would call", "called"]},
+    {"num": 10, "category": "Grammar & Vocabulary", "questionText": "The plane took _______ on time despite the bad weather.", "options": ["off", "on", "up", "down"]},
+    {"num": 11, "category": "Grammar & Vocabulary", "questionText": "By the time he arrived, we _______ the project.", "options": ["finish", "have finished", "had finished", "were finishing"]},
+    {"num": 12, "category": "Grammar & Vocabulary", "questionText": "She practices _______ English every morning.", "options": ["speak", "speaking", "to speak", "speaks"]},
+    {"num": 13, "category": "Grammar & Vocabulary", "questionText": "The teacher _______ taught us history has retired.", "options": ["who", "which", "whom", "whose"]},
+    {"num": 14, "category": "Grammar & Vocabulary", "questionText": "He has been working here _______ 2015.", "options": ["for", "since", "in", "during"]},
+    {"num": 15, "category": "Grammar & Vocabulary", "questionText": "You don't like spicy food, _______?", "options": ["do you", "don't you", "are you", "did you"]},
+    {"num": 16, "category": "Grammar & Vocabulary", "questionText": "The air is heavily _______ with traffic fumes.", "options": ["pollute", "pollution", "polluted", "polluting"]},
+    {"num": 17, "category": "Grammar & Vocabulary", "questionText": "If I _______ rich, I would travel around the world.", "options": ["am", "was", "were", "would be"]},
+    {"num": 18, "category": "Grammar & Vocabulary", "questionText": "He is the _______ runner in our school.", "options": ["fast", "faster", "fastest", "more fast"]},
+    {"num": 19, "category": "Grammar & Vocabulary", "questionText": "They are looking forward to _______ their grandparents.", "options": ["visit", "visiting", "to visit", "visited"]},
+    {"num": 20, "category": "Grammar & Vocabulary", "questionText": "This book _______ by a famous writer in 1920.", "options": ["wrote", "was written", "has written", "is written"]},
+    {"num": 21, "category": "Grammar & Vocabulary", "questionText": "The movie _______ we watched last night was scary.", "options": ["who", "which", "whom", "whose"]},
+    {"num": 22, "category": "Grammar & Vocabulary", "questionText": "I wish I _______ pass the next English examination.", "options": ["can", "could", "will", "would"]},
+    {"num": 23, "category": "Grammar & Vocabulary", "questionText": "They went to school _______ the heavy rain.", "options": ["because", "although", "despite", "in spite"]},
+    {"num": 24, "category": "Grammar & Vocabulary", "questionText": "Please _______ the lamp. It's too dark here.", "options": ["turn on", "turn off", "look for", "go on"]},
+    {"num": 25, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: The girl (A) which (B) is talking to Linh (C) is my sister (D).", "options": ["The girl", "which", "talking to", "sister"]},
+    {"num": 26, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: Although (A) his broken arm (B), he tried to (C) play piano (D).", "options": ["Although", "broken arm", "tried to", "play"]},
+    {"num": 27, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: She didn't (A) went (B) to the market (C) yesterday (D).", "options": ["didn't", "went", "market", "yesterday"]},
+    {"num": 28, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: This is (A) the most useful (B) invention in (C) modern life, is it (D)?", "options": ["is", "most useful", "invention in", "is it"]},
+    {"num": 29, "category": "Cloze Test", "questionText": "Context: Internet has revolutionized the way we live. It connects millions of people (29)_______ the world. We can search for information on any topic within seconds. It also provides a variety of entertainment (30)_______ like movies, music, and games. However, spending too much time on the internet can cause health problems. We should use it (31)_______ to avoid negative impacts. Let's make it a tool for (32)_______ learning.\n\nChoose the best option for blank 29:", "options": ["around", "in", "at", "on"]},
+    {"num": 30, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 30:", "options": ["options", "tools", "devices", "machines"]},
+    {"num": 31, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 31:", "options": ["wisely", "carelessly", "badly", "quickly"]},
+    {"num": 32, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 32:", "options": ["useful", "useless", "bad", "difficult"]},
+    {"num": 33, "category": "Cloze Test", "questionText": "Context: (Same context as above)\nChoose the best linking word for network safety options:", "options": ["and", "but", "or", "so"]},
+    {"num": 34, "category": "Reading Comprehension", "questionText": "Passage: Energy conservation is very important for our planet. We use fossil fuels like coal, oil, and gas for energy, but they run out quickly and cause environmental pollution. Renewable energy sources like wind and solar power are clean and sustainable alternatives. By turning off unused lights and appliances, we can help protect natural resources.\n\nQuestion: What are coal, oil, and gas examples of?", "options": ["Renewable energy", "Fossil fuels", "Clean energy", "Water power"]},
+    {"num": 35, "category": "Reading Comprehension", "questionText": "Passage: (Same passage as above)\n\nQuestion: What is an advantage of wind and solar power?", "options": ["They run out quickly", "They cause pollution", "They are clean and sustainable", "They are expensive"]},
+    {"num": 36, "category": "Reading Comprehension", "questionText": "Passage: (Same passage as above)\n\nQuestion: How can we help protect natural resources according to the text?", "options": ["By turning off unused lights", "By using more oil", "By cutting down trees", "By keeping the TV on"]},
+    {"num": 37, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: 'I am doing my homework now,' John said.", "options": ["John said he was doing his homework then.", "John said he is doing his homework now.", "John said I was doing my homework then.", "John told he is doing his homework then."]},
+    {"num": 38, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: They built this stadium last year.", "options": ["This stadium was built last year.", "This stadium is built last year.", "This stadium has been built last year.", "This stadium built last year."]},
+    {"num": 39, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: Because of the dense fog, we couldn't go out.", "options": ["The fog was so dense that we couldn't go out.", "Although the fog was dense, we went out.", "The dense fog made us can go out.", "We could go out if the fog wasn't dense."]},
+    {"num": 40, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: This is the most beautiful flower I have ever seen.", "options": ["I have never seen a more beautiful flower than this one.", "I saw a beautiful flower like this before.", "This flower is less beautiful than others.", "I used to see more beautiful flowers."]}
+  ]
+},
+
+{
+    title: "Đề Tiếng Anh 9 - Đề 8",
+    duration: 60,
+    totalQuestions: 40,
+    questions: [
+    {"num": 1, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["boxes", "watches", "dishes", "keys"]},
+    {"num": 2, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["passed", "watched", "cleaned", "stopped"]},
+    {"num": 3, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["great", "clean", "beach", "teacher"]},
+    {"num": 4, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["honest", "honor", "hour", "history"]},
+    {"num": 5, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["brother", "sister", "career", "father"]},
+    {"num": 6, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["difficult", "important", "beautiful", "dangerous"]},
+    {"num": 7, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["happen", "listen", "allow", "open"]},
+    {"num": 8, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["scientific", "academic", "political", "geographic"]},
+    {"num": 9, "category": "Grammar & Vocabulary", "questionText": "If she studied harder, she _______ the exam.", "options": ["will pass", "would pass", "passed", "passes"]},
+    {"num": 10, "category": "Grammar & Vocabulary", "questionText": "We decided to put _______ the meeting until next Friday.", "options": ["off", "on", "up", "down"]},
+    {"num": 11, "category": "Grammar & Vocabulary", "questionText": "When I came, they _______ dinner in the kitchen.", "options": ["cooked", "were cooking", "have cooked", "are cooking"]},
+    {"num": 12, "category": "Grammar & Vocabulary", "questionText": "They suggest _______ to the museum this weekend.", "options": ["go", "going", "to go", "goes"]},
+    {"num": 13, "category": "Grammar & Vocabulary", "questionText": "The laptop _______ I bought yesterday is very fast.", "options": ["which", "who", "whom", "whose"]},
+    {"num": 14, "category": "Grammar & Vocabulary", "questionText": "We have lived in this town _______ ten years.", "options": ["since", "for", "in", "during"]},
+    {"num": 15, "category": "Grammar & Vocabulary", "questionText": "You don't like playing football, _______?", "options": ["do you", "don't you", "are you", "did you"]},
+    {"num": 16, "category": "Grammar & Vocabulary", "questionText": "The party was _______ organized, so everyone felt disappointed.", "options": ["good", "well", "badly", "carefully"]},
+    {"num": 17, "category": "Grammar & Vocabulary", "questionText": "If the weather _______ fine tomorrow, we will go camping.", "options": ["is", "will be", "was", "were"]},
+    {"num": 18, "category": "Grammar & Vocabulary", "questionText": "This computer is _______ than that one.", "options": ["expensive", "more expensive", "most expensive", "as expensive"]},
+    {"num": 19, "category": "Grammar & Vocabulary", "questionText": "My sister is interested in _______ history books.", "options": ["read", "reading", "to read", "reads"]},
+    {"num": 20, "category": "Grammar & Vocabulary", "questionText": "A new library _______ in our school next month.", "options": ["will build", "will be built", "is building", "built"]},
+    {"num": 21, "category": "Grammar & Vocabulary", "questionText": "The man _______ spoke to you is my uncle.", "options": ["who", "which", "whom", "whose"]},
+    {"num": 22, "category": "Grammar & Vocabulary", "questionText": "I wish I _______ more free time right now.", "options": ["have", "had", "will have", "would have"]},
+    {"num": 23, "category": "Grammar & Vocabulary", "questionText": "_______ he was tired, he finished his work on time.", "options": ["Because", "Although", "Despite", "In spite of"]},
+    {"num": 24, "category": "Grammar & Vocabulary", "questionText": "Remember to _______ the lights before leaving.", "options": ["turn off", "turn on", "look for", "fill in"]},
+    {"num": 25, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: The boy (A) which (B) won the first prize is (C) my classmate (D).", "options": ["The boy", "which", "is", "my classmate"]},
+    {"num": 26, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: In spite of (A) it rained (B) heavily, they went (C) out (D).", "options": ["In spite of", "it rained", "went", "out"]},
+    {"num": 27, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: My father (A) enjoys (B) to watch (C) television (D).", "options": ["My father", "enjoys", "to watch", "television"]},
+    {"num": 28, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: She has (A) learned English (B) for (C) 2018 (D).", "options": ["has", "learned", "for", "2018"]},
+    {"num": 29, "category": "Cloze Test", "questionText": "Context: Computers are very important in the modern world. They help us (29)_______ a large amount of information. Millions of people use computers for their work every day. Children enjoy playing games on computers, but they shouldn't spend too much time (30)_______ them. Sitting in front of the screen for hours can be harmful (31)_______ their eyes. Therefore, we should use this useful invention (32)_______.\n\nChoose the best option for blank 29:", "options": ["store", "sell", "buy", "make"]},
+    {"num": 30, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 30:", "options": ["on", "at", "with", "in"]},
+    {"num": 31, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 31:", "options": ["to", "for", "with", "about"]},
+    {"num": 32, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 32:", "options": ["wisely", "carelessly", "badly", "quickly"]},
+    {"num": 33, "category": "Cloze Test", "questionText": "Context: (Same context as above)\nChoose the best auxiliary option for healthy living habit:", "options": ["should", "mustn't", "can't", "won't"]},
+    {"num": 34, "category": "Reading Comprehension", "questionText": "Passage: Tet holiday is the most important festival in Vietnam. It usually takes place from late January to early February. Before Tet, Vietnamese people clean and decorate their houses. They also cook traditional foods such as Banh Chung. During Tet, people visit their relatives, teachers, and friends. Children receive lucky money inside red envelopes.\n\nQuestion: When does Tet holiday usually happen?", "options": ["In December", "From late January to early February", "In late February", "In early January"]},
+    {"num": 35, "category": "Reading Comprehension", "questionText": "Passage: (Same passage as above)\n\nQuestion: What do people do to their houses before Tet?", "options": ["They sell them", "They clean and decorate them", "They rebuild them", "They paint them black"]},
+    {"num": 36, "category": "Reading Comprehension", "questionText": "Passage: (Same passage as above)\n\nQuestion: What do children receive during Tet?", "options": ["Books", "Lucky money", "New cars", "Toys"]},
+    {"num": 37, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: 'I am going to Hanoi next week,' Nam said.", "options": ["Nam said he was going to Hanoi the following week.", "Nam said he is going to Hanoi next week.", "Nam said I was going to Hanoi next week.", "Nam told he was going to Hanoi next week."]},
+    {"num": 38, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: They built this bridge in 2020.", "options": ["This bridge was built in 2020.", "This bridge is built in 2020.", "This bridge has been built in 2020.", "This bridge was build in 2020."]},
+    {"num": 39, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: Because of his laziness, he failed the exam.", "options": ["Because he was lazy, he failed the exam.", "Although he was lazy, he passed the exam.", "He was lazy, but he passed the exam.", "He failed the exam though he was diligent."]},
+    {"num": 40, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: I have never read a more interesting story than this one.", "options": ["This is the most interesting story I have ever read.", "This story is less interesting than others.", "I used to read more interesting stories.", "I have read this story many times."]}
+  ]
+},
+
+{
+    title: "Đề Tiếng Anh 9 - Đề 9",
+    duration: 60,
+    totalQuestions: 40,
+    questions: [
+    {"num": 1, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["laughs", "keeps", "cleaners", "months"]},
+    {"num": 2, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["invited", "wanted", "needed", "worked"]},
+    {"num": 3, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["great", "beautiful", "peaceful", "cheap"]},
+    {"num": 4, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["chemistry", "children", "church", "chair"]},
+    {"num": 5, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["window", "kitchen", "hotel", "bedroom"]},
+    {"num": 6, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["confident", "polluted", "natural", "excellent"]},
+    {"num": 7, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["destroy", "provide", "receive", "visit"]},
+    {"num": 8, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["possibility", "nationality", "recommendation", "satisfaction"]},
+    {"num": 9, "category": "Grammar & Vocabulary", "questionText": "If we protect the environment, we _______ a better life.", "options": ["will have", "would have", "had", "have had"]},
+    {"num": 10, "category": "Grammar & Vocabulary", "questionText": "She turned _______ the job offer because the salary was too low.", "options": ["down", "up", "on", "off"]},
+    {"num": 11, "category": "Grammar & Vocabulary", "questionText": "They _______ each other since they left school in 2022.", "options": ["haven't seen", "didn't see", "don't see", "hadn't seen"]},
+    {"num": 12, "category": "Grammar & Vocabulary", "questionText": "It is difficult for us _______ this grammar exercise.", "options": ["understand", "to understand", "understanding", "understood"]},
+    {"num": 13, "category": "Grammar & Vocabulary", "questionText": "Do you know the woman _______ son won the championship?", "options": ["who", "whom", "which", "whose"]},
+    {"num": 14, "category": "Grammar & Vocabulary", "questionText": "The meeting will start _______ 8:00 AM tomorrow.", "options": ["on", "at", "in", "for"]},
+    {"num": 15, "category": "Grammar & Vocabulary", "questionText": "Your sister can speak French fluently, _______?", "options": ["can't she", "can she", "does she", "isn't she"]},
+    {"num": 16, "category": "Grammar & Vocabulary", "questionText": "Plastic bags are non-biodegradable, so they cause environmental _______.", "options": ["pollute", "pollution", "polluted", "polluting"]},
+    {"num": 17, "category": "Grammar & Vocabulary", "questionText": "If he _______ free time, he would join our club.", "options": ["has", "had", "will have", "would have"]},
+    {"num": 18, "category": "Grammar & Vocabulary", "questionText": "No one in my class is _______ than Linh.", "options": ["intelligent", "more intelligent", "most intelligent", "as intelligent"]},
+    {"num": 19, "category": "Grammar & Vocabulary", "questionText": "We are looking forward to _______ from you soon.", "options": ["hear", "hearing", "to hear", "heard"]},
+    {"num": 20, "category": "Grammar & Vocabulary", "questionText": "Rice _______ in many tropical countries.", "options": ["grows", "is grown", "is growing", "has grown"]},
+    {"num": 21, "category": "Grammar & Vocabulary", "questionText": "The man _______ helped us yesterday was very generous.", "options": ["who", "which", "whom", "whose"]},
+    {"num": 22, "category": "Grammar & Vocabulary", "questionText": "The boy wishes he _______ a pilot in the future.", "options": ["is", "was", "will be", "could be"]},
+    {"num": 23, "category": "Grammar & Vocabulary", "questionText": "They didn't go out for a walk _______ the heavy rain.", "options": ["because", "although", "because of", "despite"]},
+    {"num": 24, "category": "Grammar & Vocabulary", "questionText": "Please _______ the radio. It's too loud.", "options": ["turn down", "turn up", "turn on", "look for"]},
+    {"num": 25, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: The book (A) who (B) I bought (C) yesterday is fantastic (D).", "options": ["The book", "who", "bought", "fantastic"]},
+    {"num": 26, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: Despite (A) he was tired (B), he finished (C) his project (D).", "options": ["Despite", "he was tired", "finished", "his project"]},
+    {"num": 27, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: He stopped (A) smoke (B) because it was (C) bad for his health (D).", "options": ["stopped", "smoke", "because", "bad for"]},
+    {"num": 28, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: You (A) haven't finished (B) your assignment (C), have you (D)?", "options": ["You", "haven't finished", "assignment", "have you"]},
+    {"num": 29, "category": "Cloze Test", "questionText": "Context: Water is essential for all living things. We cannot survive (29)_______ water for more than a few days. However, fresh water resources are limited because of pollution and waste. Many rivers and lakes have been heavily polluted by industrial waste. We must (30)_______ water and reduce pollution to protect our planet. Simple actions like turning off the tap while brushing teeth can help save water. Let's act (31)_______ for a better (32)_______.\n\nChoose the best option for blank 29:", "options": ["without", "with", "for", "by"]},
+    {"num": 30, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 30:", "options": ["save", "spend", "throw", "make"]},
+    {"num": 31, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 31:", "options": ["together", "alone", "separately", "badly"]},
+    {"num": 32, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 32:", "options": ["future", "past", "history", "present"]},
+    {"num": 33, "category": "Cloze Test", "questionText": "Context: (Same context as above)\nChoose the best connector option:", "options": ["and", "but", "or", "so"]},
+    {"num": 34, "category": "Reading Comprehension", "questionText": "Passage: Solar energy is a clean and renewable source of energy. It comes from the sun and can be turned into electricity using solar panels. Unlike coal or oil, solar energy does not cause air pollution. Many households are now installing solar systems on their roofs to save money on electricity bills.\n\nQuestion: Where does solar energy come from?", "options": ["The wind", "The sun", "Coal", "Water"]},
+    {"num": 35, "category": "Reading Comprehension", "questionText": "Passage: (Same passage as above)\n\nQuestion: What is a major advantage of solar energy?", "options": ["It is expensive", "It causes air pollution", "It does not cause air pollution", "It runs out quickly"]},
+    {"num": 36, "category": "Reading Comprehension", "questionText": "Passage: (Same passage as above)\n\nQuestion: Why do households install solar panels?", "options": ["To block sunlight", "To save money on electricity bills", "To catch birds", "To make houses heavier"]},
+    {"num": 37, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: 'I will buy a new laptop tomorrow,' Lan said.", "options": ["Lan said she would buy a new laptop the next day.", "Lan said she will buy a new laptop tomorrow.", "Lan said I would buy a new laptop tomorrow.", "Lan told she will buy a new laptop the next day."]},
+    {"num": 38, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: They clean the classroom every morning.", "options": ["The classroom is cleaned every morning.", "The classroom was cleaned every morning.", "The classroom has been cleaned every morning.", "The classroom is cleaning every morning."]},
+    {"num": 39, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: Although the test was difficult, he got a high score.", "options": ["In spite of the difficult test, he got a high score.", "Because the test was difficult, he got a high score.", "Despite the test was difficult, he got a high score.", "The test was difficult so he got a high score."]},
+    {"num": 40, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: This is the most beautiful city I have ever visited.", "options": ["I have never visited a more beautiful city than this one.", "I visited a beautiful city like this before.", "This city is less beautiful than others.", "I used to visit more beautiful cities."]}
+  ]
+},
+
+{
+    title: "Đề Tiếng Anh 9 - Đề 10",
+    duration: 60,
+    totalQuestions: 40,
+    questions: [
+    {"num": 1, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["books", "cups", "hands", "hats"]},
+    {"num": 2, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["watched", "stopped", "pushed", "needed"]},
+    {"num": 3, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["find", "mind", "window", "kind"]},
+    {"num": 4, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["school", "scholar", "chef", "chemistry"]},
+    {"num": 5, "category": "Stress", "questionText": "Choose the word white main stress syllable differs from the other three.", "options": ["table", "report", "chair", "sofa"]},
+    {"num": 6, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["terrific", "historic", "economic", "fantastic"]},
+    {"num": 7, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["invite", "offer", "provide", "accept"]},
+    {"num": 8, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["organization", "pronunciation", "consideration", "responsibility"]},
+    {"num": 9, "category": "Grammar & Vocabulary", "questionText": "If I had enough money, I _______ that beautiful house.", "options": ["will buy", "bought", "would buy", "buy"]},
+    {"num": 10, "category": "Grammar & Vocabulary", "questionText": "Don't forget to _______ your shoes when you enter.", "options": ["take off", "put on", "turn off", "look for"]},
+    {"num": 11, "category": "Grammar & Vocabulary", "questionText": "While my father was reading books, my sister _______.", "options": ["plays", "was playing", "played", "is playing"]},
+    {"num": 12, "category": "Grammar & Vocabulary", "questionText": "She avoided _______ to that crowded supermarket.", "options": ["go", "going", "to go", "goes"]},
+    {"num": 13, "category": "Grammar & Vocabulary", "questionText": "The house _______ walls are green belongs to Mr. Brown.", "options": ["which", "who", "whose", "that"]},
+    {"num": 14, "category": "Grammar & Vocabulary", "questionText": "We usually have a short holiday _______ summer.", "options": ["on", "at", "in", "for"]},
+    {"num": 15, "category": "Grammar & Vocabulary", "questionText": "They haven't done their homework yet, _______?", "options": ["have they", "haven't they", "did they", "do they"]},
+    {"num": 16, "category": "Grammar & Vocabulary", "questionText": "The internet is a very useful tool, but it can be _______ if abused.", "options": ["harm", "harmful", "harmless", "harmfully"]},
+    {"num": 17, "category": "Grammar & Vocabulary", "questionText": "If it _______ heavily, the street will be flooded.", "options": ["rains", "will rain", "rained", "is raining"]},
+    {"num": 18, "category": "Grammar & Vocabulary", "questionText": "This problem is _______ than the one we solved yesterday.", "options": ["easy", "easier", "more easy", "easiest"]},
+    {"num": 19, "category": "Grammar & Vocabulary", "questionText": "They decided _______ a new community library.", "options": ["build", "building", "to build", "built"]},
+    {"num": 20, "category": "Grammar & Vocabulary", "questionText": "English _______ all over the world nowadays.", "options": ["speaks", "is spoken", "is speaking", "was spoken"]},
+    {"num": 21, "category": "Grammar & Vocabulary", "questionText": "The car _______ my father bought last month is energy-saving.", "options": ["which", "who", "whom", "whose"]},
+    {"num": 22, "category": "Grammar & Vocabulary", "questionText": "He wishes he _______ go to the party tonight.", "options": ["can", "could", "will", "would"]},
+    {"num": 23, "category": "Grammar & Vocabulary", "questionText": "They went to the stadium early _______ get a good seat.", "options": ["in order to", "so that", "because", "although"]},
+    {"num": 24, "category": "Grammar & Vocabulary", "questionText": "You should _______ this form before taking the test.", "options": ["fill in", "turn up", "look after", "go off"]},
+    {"num": 25, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: The building (A) who (B) was destroyed (C) in the storm was old (D).", "options": ["The building", "who", "was destroyed", "old"]},
+    {"num": 26, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: Because of (A) the heavy rain (B), we decided to going (C) out (D).", "options": ["Because of", "heavy rain", "going", "out"]},
+    {"num": 27, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: He is (A) the most tallest (B) boy in (C) my class (D).", "options": ["is", "most tallest", "in", "my class"]},
+    {"num": 28, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: She says (A) that she (B) will visit (C) us yesterday (D).", "options": ["says", "that", "will visit", "yesterday"]},
+    {"num": 29, "category": "Cloze Test", "questionText": "Context: Reading is one of the best habits a person can develop. Books open up a whole new world of knowledge and imagination. When you read, you can learn about different cultures and histories. Reading also helps to improve your (29)_______ and language skills. Educators suggest that children should read (30)_______ least 20 minutes a day. It's time to pick (31)_______ a book and start (32)_______!\n\nChoose the best option for blank 29:", "options": ["vocabulary", "vocabularies", "word", "letters"]},
+    {"num": 30, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 30:", "options": ["at", "on", "in", "for"]},
+    {"num": 31, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 31:", "options": ["up", "on", "off", "down"]},
+    {"num": 32, "category": "Cloze Test", "questionText": "Context: (Same context as above)\n\nChoose the best option for blank 32:", "options": ["reading", "read", "to read", "reads"]},
+    {"num": 33, "category": "Cloze Test", "questionText": "Context: (Same context as above)\nChoose the best connector option:", "options": ["and", "but", "or", "so"]},
+    {"num": 34, "category": "Reading Comprehension", "questionText": "Passage: Forests play a crucial role in maintaining global climate balance. They act as the planet's lungs by absorbing carbon dioxide and releasing oxygen. Deforestation, caused by cutting down trees for agriculture, has led to severe habitat loss and accelerated global warming.\n\nQuestion: Why are forests called the planet's lungs?", "options": ["Because they are green", "Because they absorb carbon dioxide and release oxygen", "Because humans live there", "Because they block wind"]},
+    {"num": 35, "category": "Reading Comprehension", "questionText": "Passage: (Same passage as above)\n\nQuestion: What is a main cause of deforestation?", "options": ["Planting trees", "Cutting down trees for agriculture", "Protecting animals", "Global warming"]},
+    {"num": 36, "category": "Reading Comprehension", "questionText": "Passage: (Same passage as above)\n\nQuestion: What is an effect of deforestation?", "options": ["More oxygen", "Severe habitat loss", "Cooler climate", "More plants"]},
+    {"num": 37, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: 'I have homework to do now,' Mary said.", "options": ["Mary said she had homework to do then.", "Mary said she has homework to do now.", "Mary said I had homework to do then.", "Mary told she has homework to do now."]},
+    {"num": 38, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: Shakespeare wrote this play.", "options": ["This play was written by Shakespeare.", "This play is written by Shakespeare.", "This play has been written by Shakespeare.", "This play wrote by Shakespeare."]},
+    {"num": 39, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: Despite his wealth, he lives a simple life.", "options": ["Although he is wealthy, he lives a simple life.", "Because he is wealthy, he lives a simple life.", "He is wealthy, so he lives a simple life.", "He lives a simple life in spite of he is wealthy."]},
+    {"num": 40, "category": "Sentence Transformation", "questionText": "Choose the sentence closest in meaning: This is the most difficult problem I have ever met.", "options": ["I have never met a more difficult problem than this one.", "I met a difficult problem like this before.", "This problem is less difficult than others.", "I am used to solving difficult problems."]}
+  ]
+}
+
+];
+
+let quizData;
+
+        const allAnswerKeys = [
+
+{
+  "1": "beds", "2": "decided", "3": "live", "4": "think", "5": "career", "6": "important", "7": "allow", "8": "environment", "9": "would pass", "10": "call off",
+  "11": "was cooking", "12": "going", "13": "who", "14": "for", "15": "do you", "16": "well", "17": "is", "18": "more expensive", "19": "visiting", "20": "will be built",
+  "21": "which", "22": "had", "23": "Although", "24": "turn off", "25": "which", "26": "In spite of", "27": "to watch", "28": "for", "29": "modern", "30": "work",
+  "31": "on", "32": "to", "33": "invention", "34": "From late January to early February", "35": "They clean and decorate them", "36": "Because they receive lucky money",
+  "37": "Nam said he was going to Hanoi the following week.", "38": "This bridge was built in 2020.", "39": "Because he was lazy, he failed the exam.", "40": "This is the most interesting story I have ever read."
+};
+
+{
+  "1": "cleaners", "2": "worked", "3": "great", "4": "chemistry", "5": "hotel", "6": "polluted", "7": "visit", "8": "satisfaction", "9": "will have", "10": "down",
+  "11": "haven't seen", "12": "to understand", "13": "whose", "14": "at", "15": "can't she", "16": "pollution", "17": "had", "18": "more intelligent", "19": "hearing", "20": "is grown",
+  "21": "who", "22": "could be", "23": "because of", "24": "turn down", "25": "who", "26": "Despite", "27": "smoke", "28": "have you", "29": "without", "30": "limited",
+  "31": "protect", "32": "save", "33": "better", "34": "The sun", "35": "It does not cause air pollution", "36": "To save money on electricity bills",
+  "37": "Lan said she would buy a new laptop the next day.", "38": "The classroom is cleaned every morning.", "39": "In spite of the difficult test, he got a high score.", "40": "I have never visited a more beautiful city than this one."
+};
+
+{
+  "1": "hands", "2": "needed", "3": "window", "4": "chef", "5": "report", "6": "economic", "7": "offer", "8": "responsibility", "9": "would buy", "10": "take off",
+  "11": "was playing", "12": "going", "13": "whose", "14": "in", "15": "have they", "16": "harmful", "17": "rains", "18": "easier", "19": "to build", "20": "is spoken",
+  "21": "which", "22": "could be", "23": "in order to", "24": "fill in", "25": "who", "26": "going", "27": "most tallest", "28": "will visit", "29": "world", "30": "cultures",
+  "31": "skills", "32": "a", "33": "start", "34": "Because they absorb carbon dioxide and release oxygen", "35": "Cutting down trees for agriculture and wood", "36": "Severe habitat loss",
+  "37": "Mary said she had homework to do then.", "38": "This play was written by Shakespeare.", "39": "Although he is wealthy, he lives a very simple life.", "40": "I have never met a more difficult problem than this one."
+};
+
+{
+  "1": "clothes", "2": "cleaned", "3": "seat", "4": "hour", "5": "advice", "6": "excellent", "7": "depend", "8": "political", "9": "will go", "10": "after",
+  "11": "had started", "12": "speaking", "13": "where", "14": "on", "15": "has he", "16": "successful", "17": "were", "18": "faster", "19": "to finish", "20": "was repaired",
+  "21": "who", "22": "would have", "23": "despite", "24": "turn off", "25": "which", "26": "Because", "27": "found", "28": "since", "29": "eat", "30": "regularly",
+  "31": "better", "32": "today", "33": "should", "34": "To protect the country from invaders", "35": "Mountains and deserts", "36": "Millions of tourists from all over the world",
+  "37": "Peter said he could solve that puzzle.", "38": "This cake was made by my mother.", "39": "Because it snowed heavily, the flight was delayed.", "40": "This is the most beautiful painting I have ever seen."
+};
+
+{
+  "1": "plays", "2": "saved", "3": "bread", "4": "ghost", "5": "police", "6": "environmental", "7": "rubbish", "8": "responsibility", "9": "will catch", "10": "meeting",
+  "11": "have built", "12": "reading", "13": "whose", "14": "in", "15": "has she", "16": "convenience", "17": "had", "18": "taller", "19": "to stop", "20": "has been built",
+  "21": "who", "22": "could be", "23": "despite", "24": "turn off", "25": "are", "26": "Although", "27": "to read", "28": "since", "29": "local", "30": "entertainment",
+  "31": "pollution", "32": "careful", "33": "and", "34": "In the Himalayas", "35": "Freezing weather, strong winds, and lack of oxygen", "36": "Hundreds of climbers from all over the world",
+  "37": "Tom said he was practicing piano then.", "38": "This famous picture was painted by Picasso.", "39": "Because the fog was dense, they canceled the match.", "40": "This is the most delicious food I have ever tasted."
+};
+
+{
+  "1": "finds", "2": "arrived", "3": "hit", "4": "machine", "5": "alone", "6": "fascinating", "7": "cancel", "8": "qualification", "9": "will change", "10": "off",
+  "11": "had learned", "12": "making", "13": "which", "14": "at", "15": "haven't they", "16": "careful", "17": "were", "18": "more difficult", "19": "to build", "20": "was destroyed",
+  "21": "who", "22": "could be", "23": "because of", "24": "after", "25": "which", "26": "In spite of", "27": "went", "28": "since", "29": "environment", "30": "dirty",
+  "31": "plant", "32": "protecting", "33": "should", "34": "Plastic pollution", "35": "Jellyfish", "36": "Ban single-use plastic items",
+  "37": "John told me he would help me the next day.", "38": "A new school has been built near my house.", "39": "Because he worked hard, he passed the exam.", "40": "I have never watched a more interesting movie than this one."
+};
+
+{
+  "1": "dogs", "2": "played", "3": "sit", "4": "thin", "5": "advice", "6": "expensive", "7": "borrow", "8": "communication", "9": "will call", "10": "off",
+  "11": "had finished", "12": "speaking", "13": "who", "14": "since", "15": "do you", "16": "polluted", "17": "were", "18": "fastest", "19": "visiting", "20": "was written",
+  "21": "which", "22": "could be", "23": "despite", "24": "turn on", "25": "which", "26": "Although", "27": "went", "28": "is it", "29": "around", "30": "options",
+  "31": "wisely", "32": "useful", "33": "and", "34": "Fossil fuels", "35": "They are clean and sustainable", "36": "By turning off unused lights",
+  "37": "John said he was doing his homework then.", "38": "This stadium was built last year.", "39": "The fog was so dense that we couldn't go out.", "40": "I have never seen a more beautiful flower than this one."
+};
+
+{
+  "1": "keys", "2": "cleaned", "3": "great", "4": "history", "5": "career", "6": "important", "7": "allow", "8": "political", "9": "would pass", "10": "off",
+  "11": "were cooking", "12": "going", "13": "which", "14": "for", "15": "do you", "16": "badly", "17": "is", "18": "more expensive", "19": "reading", "20": "will be built",
+  "21": "who", "22": "had", "23": "Although", "24": "turn off", "25": "which", "26": "In spite of", "27": "to watch", "28": "for", "29": "store", "30": "on",
+  "31": "to", "32": "wisely", "33": "should", "34": "From late January to early February", "35": "They clean and decorate them", "36": "Lucky money",
+  "37": "Nam said he was going to Hanoi the following week.", "38": "This bridge was built in 2020.", "39": "Because he was lazy, he failed the exam.", "40": "This is the most interesting story I have ever read."
+};
+
+{
+  "1": "cleaners", "2": "worked", "3": "great", "4": "chemistry", "5": "hotel", "6": "polluted", "7": "visit", "8": "satisfaction", "9": "will have", "10": "down",
+  "11": "haven't seen", "12": "to understand", "13": "whose", "14": "at", "15": "can't she", "16": "pollution", "17": "had", "18": "more intelligent", "19": "hearing", "20": "is grown",
+  "21": "who", "22": "could be", "23": "because of", "24": "turn down", "25": "who", "26": "Despite", "27": "smoke", "28": "have you", "29": "without", "30": "save",
+  "31": "together", "32": "future", "33": "and", "34": "The sun", "35": "It does not cause air pollution", "36": "To save money on electricity bills",
+  "37": "Lan said she would buy a new laptop the next day.", "38": "The classroom is cleaned every morning.", "39": "In spite of the difficult test, he got a high score.", "40": "I have never visited a more beautiful city than this one."
+};
+
+{
+  "1": "hands", "2": "needed", "3": "window", "4": "chef", "5": "report", "6": "economic", "7": "offer", "8": "responsibility", "9": "would buy", "10": "take off",
+  "11": "was playing", "12": "going", "13": "whose", "14": "in", "15": "have they", "16": "harmful", "17": "rains", "18": "easier", "19": "to build", "20": "is spoken",
+  "21": "which", "22": "could be", "23": "in order to", "24": "fill in", "25": "who", "26": "going", "27": "most tallest", "28": "will visit", "29": "vocabulary", "30": "at",
+  "31": "up", "32": "reading", "33": "and", "34": "Because they absorb carbon dioxide and release oxygen", "35": "Cutting down trees for agriculture", "36": "Severe habitat loss",
+  "37": "Mary said she had homework to do then.", "38": "This play was written by Shakespeare.", "39": "Although he is wealthy, he lives a simple life.", "40": "I have never met a more difficult problem than this one."
+};
+
+];
+
+let answerKeys;
 
         let studentAnswers = {};
         let timeRemaining = quizData.duration * 60;
@@ -349,6 +874,7 @@
             } else {
                 const nameInp = document.getElementById('student-name').value.trim();
                 const classInp = document.getElementById('student-class').value;
+                selectedQuizIndex = parseInt(document.getElementById('quiz-select').value);
 
                 if (!nameInp) {
                     errMsg.innerText = "Vui lòng điền chính xác họ tên của bạn!";
@@ -363,20 +889,23 @@
                 document.getElementById('quiz-screen').style.display = 'flex';
                 document.getElementById('user-display').innerText = `Học sinh: ${currentStudentName} (${currentStudentClass})`;
                 
+                quizData = allQuizzes[selectedQuizIndex];
+                answerKeys = allAnswerKeys[selectedQuizIndex];
+
                 initQuiz();
             }
         }
 
         window.loadSubmissions = async function() {
             const tableBody = document.getElementById('submissions-table-body');
-            tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #888;">Đang làm mới dữ liệu...</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #888;">Đang làm mới dữ liệu...</td></tr>`;
             
             try {
                 const q = query(collection(db, "submissions"), orderBy("submittedAt", "desc"));
                 const querySnapshot = await getDocs(q);
                 
                 if(querySnapshot.empty) {
-                    tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #888;">Chưa có học sinh nào nộp bài.</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #888;">Chưa có học sinh nào nộp bài.</td></tr>`;
                     return;
                 }
                 
@@ -393,6 +922,7 @@
                         <td>${stt++}</td>
                         <td style="font-weight: 600;">${data.studentName || 'Ẩn danh'}</td>
                         <td>${data.studentClass || 'Không rõ'}</td>
+                        <td>${data.quizTitle || 'Không rõ'}</td>
                         <td>${data.correctCount || '0/40'}</td>
                         <td><span class="score-badge">${data.score !== undefined ? data.score.toFixed(2) : '0.00'}</span></td>
                         <td style="color: #666; font-size: 13px;">${date}</td>
@@ -402,7 +932,7 @@
                 });
             } catch (error) {
                 console.error(error);
-                tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #d93025;">Lỗi lấy dữ liệu: ${error.message}</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #d93025;">Lỗi lấy dữ liệu: ${error.message}</td></tr>`;
             }
         }
 
@@ -507,6 +1037,7 @@
                 await addDoc(collection(db, "submissions"), {
                     studentName: currentStudentName,
                     studentClass: currentStudentClass,
+                    quizTitle: quizData.title,
                     score: parseFloat(score.toFixed(2)),
                     correctCount: `${correctCount}/40`,
                     answers: studentAnswers,
