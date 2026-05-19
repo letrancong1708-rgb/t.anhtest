@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Tiếng Anh 9 </title>
+    <title>Hệ Thống Kiểm Tra Tiếng Anh 9</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #f0f2f5; color: #333; display: flex; flex-direction: column; min-height: 100vh; }
 
-        /* Giao diện Nhập thông tin học sinh & Đăng nhập Giáo viên */
+        /* Giao diện Đăng nhập */
         .login-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; position: relative; }
         .login-card { background: white; padding: 30px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; position: relative; z-index: 1; }
         .login-card h2 { color: #1a73e8; margin-bottom: 10px; }
@@ -38,12 +38,11 @@
         .sidebar { flex: 1; background-color: white; border-left: 1px solid #e0e0e0; padding: 20px; display: flex; flex-direction: column; gap: 20px; position: sticky; top: 70px; height: calc(100vh - 70px); }
         .timer-box { background-color: #e8f0fe; color: #1a73e8; padding: 15px; border-radius: 8px; text-align: center; font-size: 24px; font-weight: bold; border: 1px solid #d2e3fc; }
         .grid-title { font-weight: bold; margin-bottom: 5px; color: #5f6368; }
-        .nav-grid { display: grid; grid-template-columns: repeat(5, 10fr); gap: 8px; max-height: 250px; overflow-y: auto; padding: 5px; }
+        .nav-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; max-height: 250px; overflow-y: auto; padding: 5px; }
         .nav-item { background-color: #f1f3f4; border: 1px solid #dadce0; border-radius: 4px; padding: 10px 0; text-align: center; cursor: pointer; font-weight: 600; transition: all 0.2s; }
         .nav-item.answered { background-color: #1a73e8; color: white; border-color: #1a73e8; }
 
-        .question-card { background: white; padding: 20px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-left: 5px solid #bdc1c6; }
-        .question-card.active-card { border-left-color: #1a73e8; }
+        .question-card { background: white; padding: 20px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-left: 5px solid #1a73e8; }
         .category-tag { display: inline-block; background: #e8f0fe; color: #1a73e8; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-bottom: 10px; }
         .question-text { font-size: 16px; font-weight: 600; margin-bottom: 15px; line-height: 1.5; white-space: pre-line; }
         .options-list { display: flex; flex-direction: column; gap: 10px; }
@@ -64,7 +63,6 @@
         .score-badge { display: inline-block; padding: 4px 8px; background: #e8f0fe; color: #1a73e8; font-weight: bold; border-radius: 4px; }
         .btn-refresh { background: #1a73e8; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; float: right; }
         .btn-delete { background-color: #d93025; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600; transition: background 0.2s; }
-        .btn-delete:hover { background-color: #b31412; }
 
         #result-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; padding: 30px; border-radius: 12px; text-align: center; max-width: 400px; width: 90%; }
@@ -74,7 +72,7 @@
         @media (max-width: 768px) {
             .container { flex-direction: column-reverse; }
             .sidebar { position: relative; top: 0; height: auto; border-left: none; border-bottom: 1px solid #e0e0e0; }
-            .nav-grid { grid-template-columns: repeat(8, 10fr); }
+            .nav-grid { grid-template-columns: repeat(8, 1fr); }
         }
     </style>
 </head>
@@ -220,80 +218,83 @@
         let studentAnswers = {};
         let timeRemaining = 3600;
 
-        // GỐC: Cấu trúc 40 câu hỏi chuẩn chuẩn hóa của bạn
+        // CẤU TRÚC GỐC 40 CÂU - ĐƯỢC GIỮ CỐ ĐỊNH THỨ TỰ CÁC DẠNG BÀI TỪ 1 ĐẾN 40
         const baseMasterQuestions = [
-            {"category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["cats", "dogs", "books", "roofs"], "answer": "dogs"},
-            {"category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["started", "washed", "liked", "looked"], "answer": "started"},
-            {"category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["teacher", "student", "doctor", "degree"], "answer": "degree"},
-            {"category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["beautiful", "dangerous", "expensive", "difficult"], "answer": "expensive"},
-            {"category": "Grammar & Vocabulary", "questionText": "If I _______ you, I would accept that job offer immediately.", "options": ["am", "was", "were", "would be"], "answer": "were"},
-            {"category": "Grammar & Vocabulary", "questionText": "The company decided to _______ the meeting until next Monday.", "options": ["put off", "call off", "take off", "turn down"], "answer": "put off"},
-            {"category": "Grammar & Vocabulary", "questionText": "By the time the police arrived, the thieves _______ with the money.", "options": ["escaped", "have escaped", "had escaped", "were escaping"], "answer": "had escaped"},
-            {"category": "Grammar & Vocabulary", "questionText": "She enjoys _______ books in her free time.", "options": ["to read", "reading", "read", "reads"], "answer": "reading"},
-            {"category": "Grammar & Vocabulary", "questionText": "The book _______ you lent me yesterday is very interesting.", "options": ["which", "who", "whom", "whose"], "answer": "which"},
-            {"category": "Grammar & Vocabulary", "questionText": "He has been playing the guitar _______ 2020.", "options": ["for", "since", "in", "during"], "answer": "since"},
-            {"category": "Grammar & Vocabulary", "questionText": "Your brother doesn't like playing video games, _______?", "options": ["does he", "doesn't he", "did he", "is he"], "answer": "does he"},
-            {"category": "Grammar & Vocabulary", "questionText": "The air in the city is seriously _______ by exhaust fumes from vehicles.", "options": ["pollute", "pollution", "polluted", "polluting"], "answer": "polluted"},
-            {"category": "Rearrangement", "questionText": "Choose the correct order of the following sentences to make a meaningful text:\na. Additionally, it helps us relax after a long hard-working day.\nb. Reading books plays an important role in developing our knowledge.\nc. Therefore, we should build a habit of reading every day.", "options": ["b - a - c", "a - b - c", "c - b - a", "b - c - a"], "answer": "b - a - c"},
-            {"category": "Rearrangement", "questionText": "Choose the correct order of the following sentences to make a meaningful text:\na. He works as a volunteer doctor at a local hospital now.\nb. My uncle graduated from medical university five years ago.\nc. He always takes good care of poor patients with great love.", "options": ["b - a - c", "a - b - c", "c - b - a", "b - c - a"], "answer": "b - a - c"},
-            {"category": "Rearrangement", "questionText": "Choose the correct order of the following sentences to make a meaningful text:\na. However, the flight was delayed for two hours because of heavy rain.\nb. Yesterday, they went to the airport early to catch a flight to Paris.\nc. They felt a bit tired but excited about their upcoming holiday.", "options": ["b - a - c", "b - c - a", "a - b - c", "c - a - b"], "answer": "b - a - c"},
-            {"category": "Synonyms", "questionText": "Choose the word or phrase that is CLOSEST in meaning to the underlined part:\nWe should find ways to reduce our **carbon footprint** to protect the environment.", "options": ["increase", "minimize", "destroy", "develop"], "answer": "minimize"},
-            {"category": "Synonyms", "questionText": "Choose the word or phrase that is CLOSEST in meaning to the underlined part:\nMany international organizations have been set up to **look after** endangered animals.", "options": ["take care of", "take part in", "look for", "give up"], "answer": "take care of"},
-            {"category": "Antonyms", "questionText": "Choose the word or phrase that is OPPOSITE in meaning to the underlined part:\nUsing public transport is a very **effective** way to reduce traffic jams.", "options": ["useful", "efficient", "ineffective", "helpless"], "answer": "ineffective"},
-            {"category": "Antonyms", "questionText": "Choose the word or phrase that is OPPOSITE in meaning to the underlined part:\nThe dynamic teacher **encouraged** all students to participate in the English debate club.", "options": ["discouraged", "supported", "allowed", "persuaded"], "answer": "discouraged"},
-            {"category": "Cloze Test", "questionText": "Context: English is a very useful (20)_______. If we know English, we can go to any country we like. We will not find it hard to make people (21)_______ what we want to say. English also helps us to learn all kinds of (22)_______. Hundreds of books are (23)______ in English every day in many countries. Therefore, the English language has helped to spread better understanding and friendship (24)_______ countries of the world. It is also the language of international (25)_______ and trade.\n\nChoose the best option to fill in the blank 20:", "options": ["language", "country", "subject", "science"], "answer": "language"},
-            {"category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nChoose the best option to fill in the blank 21:", "options": ["understand", "understanding", "understood", "to understand"], "answer": "understand"},
-            {"category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nChoose the best option to fill in the blank 22:", "options": ["knowledge", "subjects", "books", "skills"], "answer": "knowledge"},
-            {"category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nChoose the best option to fill in the blank 23:", "options": ["written", "write", "wrote", "writing"], "answer": "written"},
-            {"category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nChoose the best option to fill in the blank 24:", "options": ["among", "between", "from", "to"], "answer": "among"},
-            {"category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nChoose the best option to fill in the blank 25:", "options": ["communication", "communicated", "communicate", "communicative"], "answer": "communication"},
-            {"category": "Reading Comprehension", "questionText": "Passage: Every year, millions of tons of plastic waste are dumped into the oceans, causing severe damage to marine ecosystems. Sea turtles, whales, and seabirds often mistake plastic bags for food, leading to fatal consequences. Furthermore, microplastics have been found in the fish we eat, posing threats to human health. To address this crisis, many countries have started banning single-use plastics and encouraging people to use reusable bags and bottles. Small changes in our daily habits can make a big difference in protecting our planet.\n\nQuestion: What is the main topic of the passage?", "options": ["The beauty of marine ecosystems", "The dangers of plastic pollution in oceans", "How to make reusable bags", "The eating habits of sea turtles"], "answer": "The dangers of plastic pollution in oceans"},
-            {"category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 26)\n\nQuestion: According to the passage, why do marine animals eat plastic bags?", "options": ["Because plastic bags look like food to them", "Because they like the taste of plastic", "Because there is no other food in the ocean", "Because plastic helps them swim faster"], "answer": "Because plastic bags look like food to them"},
-            {"category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 26)\n\nQuestion: What solution is mentioned in the passage to address the plastic crisis?", "options": ["Dumping more waste into the land instead", "Banning single-use plastics and using reusable items", "Stopping humans from eating fish", "Cleaning the entire ocean in one day"], "answer": "Banning single-use plastics and using reusable items"},
-            {"category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 26)\n\nQuestion: The word 'fatal' in the passage is closest in meaning to _______.", "options": ["dangerous", "deadly", "safe", "important"], "answer": "deadly"},
-            {"category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 26)\n\nQuestion: Which of the following is TRUE according to the passage?", "options": ["Microplastics do not affect human health.", "Only sea turtles are harmed by plastic waste.", "Many countries have banned single-use plastics.", "Small daily changes cannot help the planet."], "answer": "Many countries have banned single-use plastics."},
-            {"category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 26)\n\nQuestion: What can be inferred from the last sentence of the passage?", "options": ["Individual actions play a role in environmental protection.", "Protecting the planet is too difficult for individuals.", "We don't need to change our habits.", "Only governments can save the planet."], "answer": "Individual actions play a role in environmental protection."},
-            {"category": "Error Identification", "questionText": "Find the underlined part that needs correction: The women (A) which (B) lives next door is (C) a famous doctor (D).", "options": ["women", "which", "is", "a famous doctor"], "answer": "which"},
-            {"category": "Error Identification", "questionText": "Find the underlined part that needs correction: Although (A) his broken leg (B), he managed to (C) win the race (D).", "options": ["Although", "his broken leg", "managed to", "win the race"], "answer": "Although"},
-            {"category": "Error Identification", "questionText": "Find the underlined part that needs correction: She didn't (A) went (B) to school yesterday (C) due to her illness (D).", "options": ["didn't", "went", "yesterday", "due to"], "answer": "went"},
-            {"category": "Error Identification", "questionText": "Find the underlined part that needs correction: The internet (A) is a (B) very useful invention (C) in modern life, is it (D)?", "options": ["The internet", "is a", "very useful invention", "is it"], "answer": "is it"},
-            {"category": "Sentence Transformation", "questionText": "Choose the sentence that is closest in meaning to the given one:\n'I will visit my grandmother tomorrow,' John said.", "options": ["John said he will visit his grandmother tomorrow.", "John said he would visit his grandmother the next day.", "John said he would visit my grandmother tomorrow.", "John told he would visit his grandmother the next day."], "answer": "John said he would visit his grandmother the next day."},
-            {"category": "Sentence Transformation", "questionText": "Choose the sentence that is closest in meaning to the given one:\nThey have just repaired the broken bridge.", "options": ["The broken bridge has just been repaired.", "The broken bridge have just been repaired.", "The broken bridge was just repaired.", "The broken bridge has just repaired."], "answer": "The broken bridge has just been repaired."},
-            {"category": "Sentence Transformation", "questionText": "Choose the sentence that is closest in meaning to the given one:\nThis is the most interesting movie I have ever watched.", "options": ["I have watched many interesting movies like this before.", "I have never watched a more interesting movie than this one.", "This movie is less interesting than the ones I have watched.", "I used to watch more interesting movies than this one."], "answer": "I have never watched a more interesting movie than this one."},
-            {"category": "Sentence Combination", "questionText": "Choose the best sentence that combines the two given sentences:\nIt rained heavily. We couldn't go to the football match.", "options": ["The heavy rain made us can't go to the football match.", "Although it rained heavily, we went to the football match.", "The rain was so heavy that we couldn't go to the football match.", "We could go to the football match if it didn't rain heavily."], "answer": "The rain was so heavy that we couldn't go to the football match."},
-            {"category": "Sentence Combination", "questionText": "Choose the best sentence that combines the two given sentences:\nHe was very tired. He still tried to finish his homework before midnight.", "options": ["Tired as he was, he tried to finish his homework before midnight.", "Because he was tired, he tried to finish his homework before midnight.", "He was too tired to finish his homework before midnight.", "He was tired, so he tried to finish his homework before midnight."], "answer": "Tired as he was, he tried to finish his homework before midnight."}
+            // 1-2: Pronunciation
+            {"num": 1, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["cats", "dogs", "books", "roofs"], "answer": "dogs"},
+            {"num": 2, "category": "Pronunciation", "questionText": "Choose the word whose underlined part differs from the other three in pronunciation.", "options": ["started", "washed", "liked", "looked"], "answer": "started"},
+            // 3-4: Stress
+            {"num": 3, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["teacher", "student", "doctor", "degree"], "answer": "degree"},
+            {"num": 4, "category": "Stress", "questionText": "Choose the word whose main stress syllable differs from the other three.", "options": ["beautiful", "dangerous", "expensive", "difficult"], "answer": "expensive"},
+            // 5-12: Grammar & Vocabulary
+            {"num": 5, "category": "Grammar & Vocabulary", "questionText": "If I _______ you, I would accept that job offer immediately.", "options": ["am", "was", "were", "would be"], "answer": "were"},
+            {"num": 6, "category": "Grammar & Vocabulary", "questionText": "The company decided to _______ the meeting until next Monday.", "options": ["put off", "call off", "take off", "turn down"], "answer": "put off"},
+            {"num": 7, "category": "Grammar & Vocabulary", "questionText": "By the time the police arrived, the thieves _______ with the money.", "options": ["escaped", "have escaped", "had escaped", "were escaping"], "answer": "had escaped"},
+            {"num": 8, "category": "Grammar & Vocabulary", "questionText": "She enjoys _______ books in her free time.", "options": ["to read", "reading", "read", "reads"], "answer": "reading"},
+            {"num": 9, "category": "Grammar & Vocabulary", "questionText": "The book _______ you lent me yesterday is very interesting.", "options": ["which", "who", "whom", "whose"], "answer": "which"},
+            {"num": 10, "category": "Grammar & Vocabulary", "questionText": "He has been playing the guitar _______ 2020.", "options": ["for", "since", "in", "during"], "answer": "since"},
+            {"num": 11, "category": "Grammar & Vocabulary", "questionText": "Your brother doesn't like playing video games, _______?", "options": ["does he", "doesn't he", "did he", "is he"], "answer": "does he"},
+            {"num": 12, "category": "Grammar & Vocabulary", "questionText": "The air in the city is seriously _______ by exhaust fumes from vehicles.", "options": ["pollute", "pollution", "polluted", "polluting"], "answer": "polluted"},
+            // 13-15: Rearrangement
+            {"num": 13, "category": "Rearrangement", "questionText": "Choose the correct order of the following sentences to make a meaningful text:\na. Additionally, it helps us relax after a long hard-working day.\nb. Reading books plays an important role in developing our knowledge.\nc. Therefore, we should build a habit of reading every day.", "options": ["b - a - c", "a - b - c", "c - b - a", "b - c - a"], "answer": "b - a - c"},
+            {"num": 14, "category": "Rearrangement", "questionText": "Choose the correct order of the following sentences to make a meaningful text:\na. He works as a volunteer doctor at a local hospital now.\nb. My uncle graduated from medical university five years ago.\nc. He always takes good care of poor patients with great love.", "options": ["b - a - c", "a - b - c", "c - b - a", "b - c - a"], "answer": "b - a - c"},
+            {"num": 15, "category": "Rearrangement", "questionText": "Choose the correct order of the following sentences to make a meaningful text:\na. However, the flight was delayed for two hours because of heavy rain.\nb. Yesterday, they went to the airport early to catch a flight to Paris.\nc. They felt a bit tired but excited about their upcoming holiday.", "options": ["b - a - c", "b - c - a", "a - b - c", "c - a - b"], "answer": "b - a - c"},
+            // 16-17: Synonyms
+            {"num": 16, "category": "Synonyms", "questionText": "Choose the word or phrase that is CLOSEST in meaning to the underlined part:\nWe should find ways to reduce our **carbon footprint** to protect the environment.", "options": ["increase", "minimize", "destroy", "develop"], "answer": "minimize"},
+            {"num": 17, "category": "Synonyms", "questionText": "Choose the word or phrase that is CLOSEST in meaning to the underlined part:\nMany international organizations have been set up to **look after** endangered animals.", "options": ["take care of", "take part in", "look for", "give up"], "answer": "take care of"},
+            // 18-19: Antonyms
+            {"num": 18, "category": "Antonyms", "questionText": "Choose the word or phrase that is OPPOSITE in meaning to the underlined part:\nUsing public transport is a very **effective** way to reduce traffic jams.", "options": ["useful", "efficient", "ineffective", "helpless"], "answer": "ineffective"},
+            {"num": 19, "category": "Antonyms", "questionText": "Choose the word or phrase that is OPPOSITE in meaning to the underlined part:\nThe dynamic teacher **encouraged** all students to participate in the English debate club.", "options": ["discouraged", "supported", "allowed", "persuaded"], "answer": "discouraged"},
+            // 20-25: Cloze Test
+            {"num": 20, "category": "Cloze Test", "questionText": "Context: English is a very useful (20)_______. If we know English, we can go to any country we like. We will not find it hard to make people (21)_______ what we want to say. English also helps us to learn all kinds of (22)_______. Hundreds of books are (23)______ in English every day in many countries. Therefore, the English language has helped to spread better understanding and friendship (24)_______ countries of the world. It is also the language of international (25)_______ and trade.\n\nChoose the best option to fill in the blank 20:", "options": ["language", "country", "subject", "science"], "answer": "language"},
+            {"num": 21, "category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nChoose the best option to fill in the blank 21:", "options": ["understand", "understanding", "understood", "to understand"], "answer": "understand"},
+            {"num": 22, "category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nChoose the best option to fill in the blank 22:", "options": ["knowledge", "subjects", "books", "skills"], "answer": "knowledge"},
+            {"num": 23, "category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nChoose the best option to fill in the blank 23:", "options": ["written", "write", "wrote", "writing"], "answer": "written"},
+            {"num": 24, "category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nChoose the best option to fill in the blank 24:", "options": ["among", "between", "from", "to"], "answer": "among"},
+            {"num": 25, "category": "Cloze Test", "questionText": "Context: (Xem lại đoạn văn ở câu 20)\n\nChoose the best option to fill in the blank 25:", "options": ["communication", "communicated", "communicate", "communicative"], "answer": "communication"},
+            // 26-31: Reading Comprehension
+            {"num": 26, "category": "Reading Comprehension", "questionText": "Passage: Every year, millions of tons of plastic waste are dumped into the oceans, causing severe damage to marine ecosystems. Sea turtles, whales, and seabirds often mistake plastic bags for food, leading to fatal consequences. Furthermore, microplastics have been found in the fish we eat, posing threats to human health. To address this crisis, many countries have started banning single-use plastics and encouraging people to use reusable bags and bottles. Small changes in our daily habits can make a big difference in protecting our planet.\n\nQuestion: What is the main topic of the passage?", "options": ["The beauty of marine ecosystems", "The dangers of plastic pollution in oceans", "How to make reusable bags", "The eating habits of sea turtles"], "answer": "The dangers of plastic pollution in oceans"},
+            {"num": 27, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 26)\n\nQuestion: According to the passage, why do marine animals eat plastic bags?", "options": ["Because plastic bags look like food to them", "Because they like the taste of plastic", "Because there is no other food in the ocean", "Because plastic helps them swim faster"], "answer": "Because plastic bags look like food to them"},
+            {"num": 28, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 26)\n\nQuestion: What solution is mentioned in the passage to address the plastic crisis?", "options": ["Dumping more waste into the land instead", "Banning single-use plastics and using reusable items", "Stopping humans from eating fish", "Cleaning the entire ocean in one day"], "answer": "Banning single-use plastics and using reusable items"},
+            {"num": 29, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 26)\n\nQuestion: The word 'fatal' in the passage is closest in meaning to _______.", "options": ["dangerous", "deadly", "safe", "important"], "answer": "deadly"},
+            {"num": 30, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 26)\n\nQuestion: Which of the following is TRUE according to the passage?", "options": ["Microplastics do not affect human health.", "Only sea turtles are harmed by plastic waste.", "Many countries have banned single-use plastics.", "Small daily changes cannot help the planet."], "answer": "Many countries have banned single-use plastics."},
+            {"num": 31, "category": "Reading Comprehension", "questionText": "Passage: (Xem lại đoạn văn ở câu 26)\n\nQuestion: What can be inferred from the last sentence of the passage?", "options": ["Individual actions play a role in environmental protection.", "Protecting the planet is too difficult for individuals.", "We don't need to change our habits.", "Only governments can save the planet."], "answer": "Individual actions play a role in environmental protection."},
+            // 32-35: Error Identification
+            {"num": 32, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: The women (A) which (B) lives next door is (C) a famous doctor (D).", "options": ["women", "which", "is", "a famous doctor"], "answer": "which"},
+            {"num": 33, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: Although (A) his broken leg (B), he managed to (C) win the race (D).", "options": ["Although", "his broken leg", "managed to", "win the race"], "answer": "Although"},
+            {"num": 34, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: She didn't (A) went (B) to school yesterday (C) due to her illness (D).", "options": ["didn't", "went", "yesterday", "due to"], "answer": "went"},
+            {"num": 35, "category": "Error Identification", "questionText": "Find the underlined part that needs correction: The internet (A) is a (B) very useful invention (C) in modern life, is it (D)?", "options": ["The internet", "is a", "very useful invention", "is it"], "answer": "is it"},
+            // 36-38: Sentence Transformation
+            {"num": 36, "category": "Sentence Transformation", "questionText": "Choose the sentence that is closest in meaning to the given one:\n'I will visit my grandmother tomorrow,' John said.", "options": ["John said he will visit his grandmother tomorrow.", "John said he would visit his grandmother the next day.", "John said he would visit my grandmother tomorrow.", "John told he would visit his grandmother the next day."], "answer": "John said he would visit his grandmother the next day."},
+            {"num": 37, "category": "Sentence Transformation", "questionText": "Choose the sentence that is closest in meaning to the given one:\nThey have just repaired the broken bridge.", "options": ["The broken bridge has just been repaired.", "The broken bridge have just been repaired.", "The broken bridge was just repaired.", "The broken bridge has just repaired."], "answer": "The broken bridge has just been repaired."},
+            {"num": 38, "category": "Sentence Transformation", "questionText": "Choose the sentence that is closest in meaning to the given one:\nThis is the most interesting movie I have ever watched.", "options": ["I have watched many interesting movies like this before.", "I have never watched a more interesting movie than this one.", "This movie is less interesting than the ones I have watched.", "I used to watch more interesting movies than this one."], "answer": "I have never watched a more interesting movie than this one."},
+            // 39-40: Sentence Combination
+            {"num": 39, "category": "Sentence Combination", "questionText": "Choose the best sentence that combines the two given sentences:\nIt rained heavily. We couldn't go to the football match.", "options": ["The heavy rain made us can't go to the football match.", "Although it rained heavily, we went to the football match.", "The rain was so heavy that we couldn't go to the football match.", "We could go to the football match if it didn't rain heavily."], "answer": "The rain was so heavy that we couldn't go to the football match."},
+            {"num": 40, "category": "Sentence Combination", "questionText": "Choose the best sentence that combines the two given sentences:\nHe was very tired. He still tried to finish his homework before midnight.", "options": ["Tired as he was, he tried to finish his homework before midnight.", "Because he was tired, he tried to finish his homework before midnight.", "He was too tired to finish his homework before midnight.", "He was tired, so he tried to finish his homework before midnight."], "answer": "Tired as he was, he tried to finish his homework before midnight."}
         ];
 
-        // Hàm xáo trộn có hạt giống (Seed-based shuffle) để tạo 10 mã đề cố định từ 1 danh sách gốc
-        function seededShuffle(array, seed) {
-            let m = array.length, t, i;
-            let arrCopy = JSON.parse(JSON.stringify(array));
-            while (m) {
-                let r = Math.sin(seed++) * 10000;
-                i = Math.floor((r - Math.floor(r)) * m--);
-                t = arrCopy[m];
-                arrCopy[m] = arrCopy[i];
-                arrCopy[i] = t;
-            }
-            return arrCopy;
-        }
-
-        // Tạo cấu trúc đề thi theo mã đề số
-        function generateQuizByCode(quizNumber) {
-            let seed = parseInt(quizNumber) * 100;
-            // Xáo trộn thứ tự các câu hỏi
-            let shuffledQuestions = seededShuffle(baseMasterQuestions, seed);
-            
-            return shuffledQuestions.map((q, idx) => {
-                let optSeed = seed + idx;
-                // Xáo trộn thứ tự các phương án lựa chọn A, B, C, D của câu hỏi đó
-                let shuffledOptions = seededShuffle(q.options, optSeed);
+        // Hàm xáo trộn đáp án dựa trên mã đề nhưng tuyệt đối giữ nguyên thứ tự câu từ 1-40
+        function shuffleOptionsOnlyBySeed(questions, quizNumber) {
+            let seed = parseInt(quizNumber) * 150;
+            return questions.map((q) => {
+                let arrCopy = JSON.parse(JSON.stringify(q.options));
+                let m = arrCopy.length, t, i;
+                
+                // Thuật toán đảo vị trí các phương án A, B, C, D
+                while (m) {
+                    let r = Math.sin(seed++) * 10000;
+                    i = Math.floor((r - Math.floor(r)) * m--);
+                    t = arrCopy[m];
+                    arrCopy[m] = arrCopy[i];
+                    arrCopy[i] = t;
+                }
+                
                 return {
-                    num: idx + 1,
+                    num: q.num,
                     category: q.category,
                     questionText: q.questionText,
-                    options: shuffledOptions,
-                    answer: q.answer // Giữ nguyên đáp án gốc để đối chiếu đối chứng lúc chấm bài
+                    options: arrCopy,
+                    answer: q.answer
                 };
             });
         }
@@ -353,12 +354,12 @@
                 currentStudentClass = classInp;
                 selectedQuizNumber = quizInp;
                 
-                // Khởi tạo đề thi 40 câu đã đảo theo mã đề cụ thể
-                activeQuizQuestions = generateQuizByCode(selectedQuizNumber);
+                // Khóa chặt thứ tự câu hỏi 1-40, chỉ đổi vị trí đáp án để tạo 10 mã đề khác biệt
+                activeQuizQuestions = shuffleOptionsOnlyBySeed(baseMasterQuestions, selectedQuizNumber);
 
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('quiz-screen').style.display = 'flex';
-                document.getElementById('user-display').innerHTML = `Học sinh: ${currentStudentName} (${currentStudentClass})<br><strong style='color:#ffe082;'>Đề số ${selectedQuizNumber}</strong>`;
+                document.getElementById('user-display').innerHTML = `Học sinh: ${currentStudentName} (${currentStudentClass})<br><strong style='color:#ffe082;'>Mã đề thi: Đề ${selectedQuizNumber}</strong>`;
 
                 initQuiz();
             }
@@ -386,7 +387,7 @@
                         <td>${data.correctCount || '0/40'}</td>
                         <td><span class="score-badge">${data.score !== undefined ? data.score.toFixed(2) : '0.00'}</span></td>
                         <td style="color: #666; font-size: 13px;">${date}</td>
-                        <td><button class="btn-delete" onclick="window.deleteSubmission('${docId}', '${data.studentName}')">Xóa</button></td>`;
+                        <td><button class="btn-delete" style="padding:4px 8px;" onclick="window.deleteSubmission('${docId}', '${data.studentName}')">Xóa</button></td>`;
                     tableBody.appendChild(row);
                 });
             } catch (error) { tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #d93025;">Lỗi: ${error.message}</td></tr>`; }
@@ -407,7 +408,7 @@
             qContainer.innerHTML = "";
             navGrid.innerHTML = "";
             studentAnswers = {};
-            timeRemaining = 60 * 60; // 60 phút
+            timeRemaining = 60 * 60; 
 
             activeQuizQuestions.forEach((q) => {
                 const qCard = document.createElement('div');
@@ -436,8 +437,6 @@
                 navItem.innerText = q.num;
                 navItem.onclick = () => {
                     document.getElementById(`q-card-${q.num}`).scrollIntoView({ behavior: 'smooth' });
-                    document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active-card'));
-                    document.getElementById(`q-card-${q.num}`).classList.add('active-card');
                 };
                 navGrid.appendChild(navItem);
             });
