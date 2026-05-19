@@ -829,20 +829,37 @@ let answerKeys;
                 desc.innerText = "Vui lòng điền thông tin để bắt đầu làm bài";
                 btn.innerText = "Bắt Đầu Làm Bài";
                 formFields.innerHTML = `
-                    <div class="form-group">
-                        <label>Họ và Tên học sinh</label>
-                        <input type="text" id="student-name" placeholder="Ví dụ: Nguyễn Văn Nghi">
-                    </div>
-                    <div class="form-group">
-                        <label>Lớp học</label>
-                        <select id="student-class">
-                            <option value="9A1">Lớp 9A1</option>
-                            <option value="9A2">Lớp 9A2</option>
-                            <option value="9A3">Lớp 9A3</option>
-                            <option value="9A4">Lớp 9A4</option>
-                        </select>
-                    </div>
-                `;
+    <div class="form-group">
+        <label>Họ và Tên học sinh</label>
+        <input type="text" id="student-name" placeholder="Ví dụ: Nguyễn Văn Nghi">
+    </div>
+
+    <div class="form-group">
+        <label>Lớp học</label>
+        <select id="student-class">
+            <option value="9A1">Lớp 9A1</option>
+            <option value="9A2">Lớp 9A2</option>
+            <option value="9A3">Lớp 9A3</option>
+            <option value="9A4">Lớp 9A4</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Chọn đề thi</label>
+        <select id="quiz-select">
+            <option value="0">Đề 1</option>
+            <option value="1">Đề 2</option>
+            <option value="2">Đề 3</option>
+            <option value="3">Đề 4</option>
+            <option value="4">Đề 5</option>
+            <option value="5">Đề 6</option>
+            <option value="6">Đề 7</option>
+            <option value="7">Đề 8</option>
+            <option value="8">Đề 9</option>
+            <option value="9">Đề 10</option>
+        </select>
+    </div>
+`;
                 toggleText.innerHTML = `Bạn là giáo viên? <span onclick="window.switchAuthMode(true)">Đăng nhập quản trị</span>`;
             }
         }
