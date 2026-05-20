@@ -247,7 +247,7 @@
             history.pushState(null, null, document.URL);
         });
         history.pushState(null, null, document.URL);
-        
+
         // *** CẤU HÌNH FIREBASE ***
         const firebaseConfig = {
             apiKey: "AIzaSyA2QpVXJQTAmMgfB0lmMaEzf2dPTjWhf10",
@@ -273,6 +273,7 @@
         let quizData = null;
         let studentAnswers = {};
         let timerInterval = null;
+        let isExiting = false;
 
         // CƠ SỞ DỮ LIỆU ĐỀ THI
         const allQuizzes = [
@@ -959,12 +960,28 @@
 
         // ===== CHỨC NĂNG THOÁT BÀI / ĐĂNG XUẤT CỦA HỌC SINH =====
         window.logoutStudent = function() {
-            // Nếu học sinh chưa nộp bài mà bấm thoát, hệ thống sẽ cảnh báo
+            // Nếu học sinh chưa nộp bài, kích hoạt trạng thái thoát để không bị tính gian lận khi hiện confirm
             if (!isSubmitted) {
+                isExiting = true; // Bật cờ thoát hợp lệ
+                
                 if (!confirm("⚠ CẢNH BÁO: Bạn chưa nộp bài! Nếu thoát bây giờ, kết quả làm bài của bạn sẽ bị mất và không được lưu lại. Bạn vẫn muốn thoát chứ?")) {
+                    isExiting = false; // Học sinh bấm Hủy -> tắt cờ thoát để tiếp tục giám sát gian lận
                     return;
                 }
             }
+            
+            if (timerInterval) clearInterval(timerInterval);
+            
+            isSubmitted = false;
+            currentStudentName = "";
+            currentStudentClass = "";
+            studentAnswers = {};
+            cheatCount = 0;
+            isExiting = false; // Reset lại biến
+            
+            document.getElementById("quiz-screen").style.display = "none";
+            document.getElementById("auth-screen").style.display = "flex";
+            window.switchAuthMode(false);
             
             // Xóa bộ đếm thời gian thi
             if (timerInterval) clearInterval(timerInterval);
@@ -1064,14 +1081,31 @@
 
         // ===== CHỐNG GIAN LẬN =====
         function setupAntiCheat() {
-            let cheatCount = 0;
-            window.addEventListener('blur', () => {
+            cheatCount = 0;
+            isExiting = false; // Reset lại khi bắt đầu bài mới
+            
+            const handleViolation = () => {
                 if (isSubmitted) return;
+                if (isExiting) return; // <--- THÊM DÒNG NÀY: Nếu đang bấm thoát thì không phạt
+                
                 cheatCount++;
-                const banner = document.getElementById("warning-banner");
-                banner.innerText = `⚠ Cảnh báo: Bạn đã rời màn hình ${cheatCount} lần!`;
-                banner.style.display = "block";
-                setTimeout(() => banner.style.display = "none", 4000);
+                
+                if (cheatCount >= MAX_CHEAT_ALLOWED) {
+                    alert(`⚠ CẢNH BÁO NỘP BÀI TỰ ĐỘNG!\nBạn đã rời khỏi màn hình làm bài quá ${MAX_CHEAT_ALLOWED} lần quy định...`);
+                    forceSubmitQuiz();
+                } else {
+                    alert(`⚠ CẢNH BÁO GIAN LẬN (${cheatCount}/${MAX_CHEAT_ALLOWED})\nBạn không được phép rời khỏi màn hình làm bài thi!`);
+                }
+            };
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'hidden') {
+                    handleViolation();
+                }
+            });
+
+            window.addEventListener('blur', () => {
+                handleViolation();
             });
         }
 
