@@ -75,6 +75,21 @@
         .modal-score { font-size: 48px; font-weight: bold; color: #1a73e8; margin: 15px 0; }
         .btn-close { background: #1a73e8; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
+        
+        .warning-banner {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #d93025;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            z-index: 9999;
+            font-size: 14px;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
         @media (max-width: 768px) {
             .container { flex-direction: column-reverse; }
             .sidebar { position: relative; top: 0; height: auto; border-left: none; border-bottom: 1px solid #e0e0e0; }
@@ -200,6 +215,12 @@
         </div>
     </div>
 
+    
+    <div class="warning-banner" id="warning-banner">
+        ⚠ Phát hiện rời khỏi màn hình làm bài!
+    </div>
+
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -226,6 +247,79 @@
         let currentStudentName = "";
         let currentStudentClass = "";
         let selectedQuizIndex = 0;
+
+        
+        // ===== CHỐNG GIAN LẬN =====
+        let cheatCount = 0;
+        let warningTimeout;
+
+        function showWarning(message) {
+            const banner = document.getElementById("warning-banner");
+            banner.innerText = "⚠ " + message;
+            banner.style.display = "block";
+
+            clearTimeout(warningTimeout);
+            warningTimeout = setTimeout(() => {
+                banner.style.display = "none";
+            }, 3000);
+        }
+
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden && document.getElementById("quiz-screen").style.display === "flex") {
+                cheatCount++;
+                showWarning("Bạn đã chuyển tab hoặc thu nhỏ màn hình!");
+
+                if (cheatCount >= 3) {
+                    alert("Bạn đã vi phạm quy chế thi quá nhiều lần. Hệ thống sẽ tự động nộp bài.");
+                    submitQuiz();
+                }
+            }
+        });
+
+        window.addEventListener("blur", () => {
+            if (document.getElementById("quiz-screen").style.display === "flex") {
+                cheatCount++;
+                showWarning("Không được rời khỏi cửa sổ làm bài!");
+
+                if (cheatCount >= 3) {
+                    alert("Hệ thống tự động nộp bài do phát hiện gian lận.");
+                    submitQuiz();
+                }
+            }
+        });
+
+        document.addEventListener("contextmenu", (e) => {
+            e.preventDefault();
+            showWarning("Chuột phải đã bị khóa!");
+        });
+
+        document.addEventListener("keydown", (e) => {
+            // F12
+            if (e.key === "F12") {
+                e.preventDefault();
+                showWarning("F12 đã bị khóa!");
+            }
+
+            // Ctrl+Shift+I / Ctrl+Shift+J / Ctrl+U / Ctrl+S
+            if (
+                (e.ctrlKey && e.shiftKey && ["I", "J", "C"].includes(e.key.toUpperCase())) ||
+                (e.ctrlKey && ["U", "S", "P"].includes(e.key.toUpperCase()))
+            ) {
+                e.preventDefault();
+                showWarning("Tổ hợp phím này đã bị khóa!");
+            }
+        });
+
+        setInterval(() => {
+            const threshold = 160;
+            if (
+                window.outerWidth - window.innerWidth > threshold ||
+                window.outerHeight - window.innerHeight > threshold
+            ) {
+                showWarning("Phát hiện mở DevTools!");
+            }
+        }, 2000);
+
 
         const allQuizzes = [
 
