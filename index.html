@@ -211,6 +211,12 @@
             <h2>Kết Quả Đã Ghi Nhận!</h2>
             <div class="modal-score" id="score-text">0.0</div>
             <p id="correct-count-text" style="margin-bottom: 20px; color: #5f6368;"></p>
+            
+            <div id="wrong-answers-box" style="margin-top:20px;text-align:left;max-height:250px;overflow:auto;border-top:1px solid #ddd;padding-top:10px;">
+                <h3 style="margin-bottom:10px;color:#d93025;">Các câu sai:</h3>
+                <div id="wrong-answers-list"></div>
+            </div>
+
             <button class="btn-close" onclick="location.reload()">Thoát hệ thống</button>
         </div>
     </div>
@@ -320,6 +326,16 @@
             }
         }, 2000);
 
+
+        
+        // ===== ĐÁP ÁN ĐÚNG =====
+        const answerKeys = [
+            [2,3,3,2,2,2,0,0,1,0,2,2,2,1,0,1,0,1,1,1,2,1,0,0,1,1,2,2,0,0,2,0,0,1,2,1,1,0,0,0],
+            [2,3,0,0,2,1,3,2,0,0,0,1,3,1,0,1,1,1,1,1,0,3,2,0,1,0,1,3,0,0,0,0,0,1,2,1,0,0,0,0],
+            [2,3,2,2,1,3,1,3,2,0,1,1,2,2,0,1,0,1,2,1,0,1,0,0,1,2,1,2,0,0,0,0,0,1,1,1,0,0,0,0],
+            [2,2,3,0,2,3,0,2,1,0,1,1,1,1,0,1,1,1,2,1,0,1,2,0,1,0,1,3,0,0,0,0,0,1,1,1,0,0,0,0],
+            [0,3,2,1,3,2,3,0,1,1,1,1,1,0,0,1,1,1,2,1,0,1,2,0,3,0,1,3,0,0,0,0,0,1,1,1,0,0,0,0]
+        ];
 
         const allQuizzes = [
 
