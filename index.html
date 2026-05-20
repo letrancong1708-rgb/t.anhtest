@@ -207,8 +207,12 @@
         <div class="modal-content">
             <h2>Kết Quả Đã Ghi Nhận!</h2>
             <div class="modal-score" id="score-text">0.0</div>
-            <p id="correct-count-text" style="margin-bottom: 15px; color: #5f6368;"></p>
-            <p style="color: #34a853; font-weight: bold; margin-bottom: 20px;">Bạn có thể tắt bảng này để xem trực tiếp các câu sai & đáp án đúng bên dưới.</p>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left; border: 1px solid #dadce0;">
+                <p style="color: #34a853; font-weight: bold; margin-bottom: 5px;">✓ Số câu đúng: <span id="summary-correct" style="float: right;">0</span></p>
+                <p style="color: #d93025; font-weight: bold; margin-bottom: 5px;">✗ Số câu sai: <span id="summary-wrong" style="float: right;">0</span></p>
+                <p style="color: #757575; font-weight: bold;">⚠ Không làm: <span id="summary-unanswered" style="float: right;">0</span></p>
+            </div>
+            <p style="color: #1a73e8; font-weight: bold; margin-bottom: 20px;">Bạn có thể tắt bảng này để xem trực tiếp các câu sai & đáp án đúng bên dưới.</p>
             <button class="btn-close" onclick="document.getElementById('result-modal').style.display='none'">Xem Lại Bài Làm</button>
         </div>
     </div>
@@ -1020,6 +1024,7 @@
         }
 
         // ===== HỌC SINH NỘP BÀI =====
+        // ===== HỌC SINH NỘP BÀI =====
         window.submitQuiz = async function() {
             if (isSubmitted) return;
             if (!confirm("Bạn có chắc chắn muốn nộp bài lên hệ thống không?")) return;
@@ -1029,9 +1034,21 @@
 
             const answerKeys = allAnswerKeys[selectedQuizIndex];
             let correctCount = 0;
-            for (let qNum in answerKeys) {
-                if (studentAnswers[qNum] === answerKeys[qNum]) correctCount++;
-            }
+            let wrongCount = 0;
+            let unansweredCount = 0;
+
+            quizData.questions.forEach((q) => {
+                const studentAns = studentAnswers[q.num];
+                const rightAns = answerKeys[q.num];
+
+                if (!studentAns || studentAns === "") {
+                    unansweredCount++;
+                } else if (studentAns === rightAns) {
+                    correctCount++;
+                } else {
+                    wrongCount++;
+                }
+            });
 
             const score = (correctCount / quizData.totalQuestions) * 10;
 
@@ -1039,22 +1056,29 @@
                 document.getElementById('main-submit-btn').innerText = "Đang gửi bài lên hệ thống...";
                 document.getElementById('main-submit-btn').disabled = true;
 
+                // Lưu dữ liệu đầy đủ lên Firebase để giáo viên cũng xem được tóm tắt
                 await addDoc(collection(db, "submissions"), {
                     studentName: currentStudentName,
                     studentClass: currentStudentClass,
                     quizTitle: quizData.title,
                     score: parseFloat(score.toFixed(2)),
-                    correctCount: `${correctCount}/${quizData.totalQuestions}`,
+                    correctCount: correctCount,
+                    wrongCount: wrongCount,
+                    unansweredCount: unansweredCount,
+                    totalQuestions: quizData.totalQuestions,
                     answers: studentAnswers,
                     quizIndex: selectedQuizIndex,
                     submittedAt: new Date().toISOString()
                 });
 
+                // Hiển thị lên bảng tóm tắt của học sinh
                 document.getElementById('score-text').innerText = score.toFixed(2) + " Điểm";
-                document.getElementById('correct-count-text').innerText = `Bạn đúng ${correctCount}/${quizData.totalQuestions} câu.`;
+                document.getElementById('summary-correct').innerText = `${correctCount} / ${quizData.totalQuestions}`;
+                document.getElementById('summary-wrong').innerText = `${wrongCount} câu`;
+                document.getElementById('summary-unanswered').innerText = `${unansweredCount} câu`;
                 document.getElementById('result-modal').style.display = 'flex';
 
-                // Hiển thị trực quan đáp án Đúng/Sai tại màn hình chính
+                // Hiển thị trực quan đáp án Đúng/Sai tại màn hình chính cho học sinh
                 quizData.questions.forEach((q) => {
                     const correctAnswer = answerKeys[q.num];
                     const studentAnswer = studentAnswers[q.num];
@@ -1070,7 +1094,9 @@
                         }
                     });
 
-                    if (studentAnswer === correctAnswer) {
+                    if (!studentAnswer || studentAnswer === "") {
+                        navItem.className = "nav-item"; // Giữ nguyên màu xám nếu không làm
+                    } else if (studentAnswer === correctAnswer) {
                         navItem.className = "nav-item correct-nav";
                     } else {
                         navItem.className = "nav-item wrong-nav";
@@ -1120,7 +1146,7 @@
                         <td style="font-weight:bold; color:#1a73e8; cursor:pointer;" onclick="viewDetail('${id}')">${data.studentName}</td>
                         <td>${data.studentClass}</td>
                         <td>${data.quizTitle}</td>
-                        <td><span style="font-weight:600;">${data.correctCount || '0/40'}</span></td>
+                        <td><span style="font-weight:600; color: #34a853;">Đúng: ${data.correctCount || 0}</span> | <span style="color: #d93025;">Sai: ${data.wrongCount || 0}</span> | <span style="color: #757575;">Trống: ${data.unansweredCount || 0}</span></td>
                         <td><span class="score-badge">${data.score.toFixed(2)}</span></td>
                         <td>${timeStr}</td>
                         <td>
@@ -1142,16 +1168,44 @@
             const container = document.getElementById("detail-review-container");
             container.innerHTML = "";
 
+            // Tính toán thống kê nếu các bài làm cũ trên Firebase chưa có sẵn thuộc tính thống kê
             const targetQuiz = allQuizzes[record.quizIndex || 0];
             const answerKey = allAnswerKeys[record.quizIndex || 0];
+            
+            let tCorrect = record.correctCount !== undefined && typeof record.correctCount === 'number' ? record.correctCount : 0;
+            let tWrong = record.wrongCount !== undefined ? record.wrongCount : 0;
+            let tUnanswered = record.unansweredCount !== undefined ? record.unansweredCount : 0;
 
+            // Nếu dữ liệu cũ trên Firebase lưu dạng chuỗi "Đúng/Tổng số câu", tính toán lại thủ công:
+            if (record.wrongCount === undefined) {
+                tCorrect = 0;
+                targetQuiz.questions.forEach((q) => {
+                    const stuAns = record.answers[q.num];
+                    const rightAns = answerKey[q.num];
+                    if (!stuAns || stuAns === "") tUnanswered++;
+                    else if (stuAns === rightAns) tCorrect++;
+                    else tWrong++;
+                });
+            }
+
+            // Tạo khối hiển thị tóm tắt cho Giáo viên xem
+            const summaryBlock = document.createElement("div");
+            summaryBlock.style.cssText = "display: flex; gap: 10px; background: #e8f0fe; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; border: 1px solid #d2e3fc; text-align: center;";
+            summaryBlock.innerHTML = `
+                <div style="flex: 1; color: #34a853;">✓ Đúng: ${tCorrect}/${targetQuiz.totalQuestions}</div>
+                <div style="flex: 1; color: #d93025;">✗ Sai: ${tWrong} câu</div>
+                <div style="flex: 1; color: #757575;">⚠ Không làm: ${tUnanswered} câu</div>
+            `;
+            container.appendChild(summaryBlock);
+
+            // Duyệt hiển thị từng câu hỏi chi tiết phía dưới
             targetQuiz.questions.forEach((q) => {
                 const block = document.createElement("div");
                 block.style.marginBottom = "20px";
                 block.style.padding = "12px";
                 block.style.borderBottom = "1px dashed #ccc";
 
-                const stuAns = record.answers[q.num] || "Chưa trả lời";
+                const stuAns = record.answers[q.num] || "";
                 const rightAns = answerKey[q.num];
 
                 let optionsListHtml = "";
@@ -1171,8 +1225,17 @@
                         </div>`;
                 });
 
+                const statusText = stuAns === "" 
+                    ? `<span style="color: #757575; font-weight: bold;">[ HỌC SINH BỎ TRỐNG CÂU NÀY ]</span>` 
+                    : (stuAns === rightAns 
+                        ? `<span style="color: #34a853; font-weight: bold;">[ ĐÚNG ]</span>` 
+                        : `<span style="color: #d93025; font-weight: bold;">[ SAI ]</span>`);
+
                 block.innerHTML = `
-                    <div style="font-size: 11px; font-weight: bold; color: #1a73e8;">Câu ${q.num} (${q.category})</div>
+                    <div style="font-size: 11px; font-weight: bold; color: #1a73e8; display: flex; justify-content: space-between;">
+                        <span>Câu ${q.num} (${q.category})</span>
+                        ${statusText}
+                    </div>
                     <div style="font-weight: 600; margin: 5px 0;">${q.questionText}</div>
                     <div>${optionsListHtml}</div>`;
                 container.appendChild(block);
