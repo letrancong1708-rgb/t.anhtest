@@ -152,7 +152,10 @@
     <div class="quiz-page" id="quiz-screen">
         <header>
             <h1 id="quiz-title">Đề Khảo Sát Tiếng Anh</h1>
-            <div class="user-info" id="user-display">Học sinh: Đang tải...</div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="user-info" id="user-display">Học sinh: Đang tải...</div>
+                <button onclick="window.logoutStudent()" style="background: #d93025; color: white; border: none; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer;">Thoát bài</button>
+            </div>
         </header>
 
         <div class="container">
@@ -171,7 +174,10 @@
     <div class="teacher-page" id="teacher-screen">
         <header>
             <h1>Bảng Điều Khiển Giáo Viên</h1>
-            <div class="user-info" id="teacher-display">Giáo viên Quản trị</div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="user-info" id="teacher-display">Giáo viên Quản trị</div>
+                <button onclick="window.logoutTeacher()" style="background: #5f6368; color: white; border: none; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer;">Đăng xuất</button>
+            </div>
         </header>
         
         <div class="teacher-card">
@@ -236,6 +242,12 @@
         import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, query, orderBy, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+        // Chặn học sinh bấm nút Back của trình duyệt khi đang làm bài
+        window.addEventListener('popstate', function () {
+            history.pushState(null, null, document.URL);
+        });
+        history.pushState(null, null, document.URL);
+        
         // *** CẤU HÌNH FIREBASE ***
         const firebaseConfig = {
             apiKey: "AIzaSyA2QpVXJQTAmMgfB0lmMaEzf2dPTjWhf10",
@@ -928,6 +940,46 @@
                 startTimer(quizData.duration);
                 setupAntiCheat();
             }
+        };
+
+        // ===== CHỨC NĂNG ĐĂNG XUẤT CỦA GIÁO VIÊN =====
+        window.logoutTeacher = async function() {
+            if (confirm("Bạn có chắc chắn muốn đăng xuất khỏi hệ thống Quản trị viên không?")) {
+                try {
+                    await auth.signOut(); // Đăng xuất tài khoản Firebase
+                    // Quay về giao diện đăng nhập ban đầu
+                    document.getElementById("teacher-screen").style.display = "none";
+                    document.getElementById("auth-screen").style.display = "flex";
+                    window.switchAuthMode(true); // Đưa về form đăng nhập giáo viên trống
+                } catch (error) {
+                    alert("Lỗi khi đăng xuất: " + error.message);
+                }
+            }
+        };
+
+        // ===== CHỨC NĂNG THOÁT BÀI / ĐĂNG XUẤT CỦA HỌC SINH =====
+        window.logoutStudent = function() {
+            // Nếu học sinh chưa nộp bài mà bấm thoát, hệ thống sẽ cảnh báo
+            if (!isSubmitted) {
+                if (!confirm("⚠ CẢNH BÁO: Bạn chưa nộp bài! Nếu thoát bây giờ, kết quả làm bài của bạn sẽ bị mất và không được lưu lại. Bạn vẫn muốn thoát chứ?")) {
+                    return;
+                }
+            }
+            
+            // Xóa bộ đếm thời gian thi
+            if (timerInterval) clearInterval(timerInterval);
+            
+            // Reset các biến trạng thái về mặc định
+            isSubmitted = false;
+            currentStudentName = "";
+            currentStudentClass = "";
+            studentAnswers = {};
+            cheatCount = 0;
+            
+            // Quay về màn hình nhập thông tin học sinh ban đầu
+            document.getElementById("quiz-screen").style.display = "none";
+            document.getElementById("auth-screen").style.display = "flex";
+            window.switchAuthMode(false); // Chuyển về chế độ nhập thông tin học sinh
         };
 
         // ===== KHỞI TẠO GIAO DIỆN LÀM BÀI =====
