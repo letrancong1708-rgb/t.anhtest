@@ -154,7 +154,7 @@
             <h1 id="quiz-title">Đề Khảo Sát Tiếng Anh</h1>
             <div style="display: flex; align-items: center; gap: 15px;">
                 <div class="user-info" id="user-display">Học sinh: Đang tải...</div>
-                <button onclick="window.logoutStudent()" style="background: #d93025; color: white; border: none; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer;">Thoát bài</button>
+                <button onclick="if(confirm('⚠ CẢNH BÁO: Bạn chưa nộp bài! Nếu thoát bây giờ, kết quả làm bài của bạn sẽ bị mất. Bạn vẫn muốn thoát chứ?')) { window.isExiting = true; location.reload(); }" style="background: #d93025; color: white; border: none; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer;">Thoát bài</button>
             </div>
         </header>
 
@@ -274,6 +274,8 @@
         let studentAnswers = {};
         let timerInterval = null;
         let isExiting = false;
+        let cheatCount = 0;
+        const MAX_CHEAT_ALLOWED = 3;
 
         // CƠ SỞ DỮ LIỆU ĐỀ THI
         const allQuizzes = [
@@ -960,10 +962,14 @@
 
         // ===== CHỨC NĂNG THOÁT BÀI / ĐĂNG XUẤT CỦA HỌC SINH =====
         // ===== CHỨC NĂNG THOÁT BÀI / ĐĂNG XUẤT CỦA HỌC SINH =====
+        // ===== CHỨC NĂNG THOÁT BÀI / ĐĂNG XUẤT CỦA HỌC SINH =====
+        // ===== CHỨC NĂNG THOÁT BÀI / ĐĂNG XUẤT CỦA HỌC SINH =====
+        // ===== CHỨC NĂNG THOÁT BÀI / ĐĂNG XUẤT CỦA HỌC SINH =====
+        // ===== CHỨC NĂNG THOÁT BÀI / ĐĂNG XUẤT CỦA HỌC SINH =====
         window.logoutStudent = function() {
             // Nếu học sinh chưa nộp bài, kích hoạt trạng thái thoát để không bị tính gian lận khi hiện confirm
             if (!isSubmitted) {
-                isExiting = true; // Bật cờ thoát hợp lệ
+                isExiting = true; // Bật cờ thoát hợp lệ để không dính cảnh báo rời màn hình
                 
                 if (!confirm("⚠ CẢNH BÁO: Bạn chưa nộp bài! Nếu thoát bây giờ, kết quả làm bài của bạn sẽ bị mất và không được lưu lại. Bạn vẫn muốn thoát chứ?")) {
                     isExiting = false; // Học sinh bấm Hủy -> tiếp tục giám sát gian lận
@@ -971,10 +977,10 @@
                 }
             }
             
-            // Xóa bộ đếm thời gian thi nếu có
+            // 1. Xóa bộ đếm thời gian thi nếu có
             if (timerInterval) clearInterval(timerInterval);
             
-            // Reset các biến trạng thái về mặc định
+            // 2. Reset các biến trạng thái thi cử về mặc định
             isSubmitted = false;
             currentStudentName = "";
             currentStudentClass = "";
@@ -982,23 +988,20 @@
             cheatCount = 0;
             isExiting = false;
             
-            // 1. Ẩn màn hình làm bài và hiện lại màn hình Đăng nhập gốc
+            // 3. Ẩn màn hình làm bài thi đi
             document.getElementById("quiz-screen").style.display = "none";
+            
+            // 4. Hiển thị lại màn hình đăng nhập tổng
             document.getElementById("auth-screen").style.display = "flex";
             
-            // 2. Ép buộc hiển thị các ô nhập thông tin của học sinh (Tên, Lớp) và ẩn ô mật khẩu giáo viên
-            document.querySelectorAll('.student-group').forEach(el => el.style.display = 'block');
-            document.querySelectorAll('.teacher-group').forEach(el => el.style.display = 'none');
+            // 5. Gọi hàm gốc trong file của bạn để ép form chuyển sang chế độ Học sinh (false)
+            if (typeof window.switchAuthMode === "function") {
+                window.switchAuthMode(false);
+            }
             
-            // 3. Đổi lại tiêu đề và nút bấm về chế độ Học sinh
-            document.getElementById('auth-title').innerText = "Thông Tin Học Sinh";
-            document.getElementById('auth-desc').innerText = "Vui lòng nhập đúng thông tin để hệ thống ghi nhận điểm.";
-            document.getElementById('btn-submit-auth').innerText = "Vào Làm Bài Thử";
-            
-            // 4. Xóa sạch các ô input cũ học sinh đã nhập trước đó để người sau nhập mới
-            document.getElementById('student-name').value = "";
-            document.getElementById('student-class').value = "";
-            document.getElementById('teacher-password').value = "";
+            // 6. Dọn sạch các ô nhập dữ liệu cũ (nếu có) để người sau vào điền mới
+            const nameInput = document.getElementById('student-name');
+            if (nameInput) nameInput.value = "";
         };
 
         // ===== KHỞI TẠO GIAO DIỆN LÀM BÀI =====
@@ -1084,19 +1087,19 @@
         // ===== CHỐNG GIAN LẬN =====
         function setupAntiCheat() {
             cheatCount = 0;
-            isExiting = false; // Reset lại khi bắt đầu bài mới
+            window.isExiting = false; // Tạo biến toàn cục để nút Thoát không bị phạt
             
             const handleViolation = () => {
                 if (isSubmitted) return;
-                if (isExiting) return; // <--- THÊM DÒNG NÀY: Nếu đang bấm thoát thì không phạt
+                if (window.isExiting) return; // Nếu đang thoát bài thì bỏ qua không phạt
                 
                 cheatCount++;
                 
                 if (cheatCount >= MAX_CHEAT_ALLOWED) {
-                    alert(`⚠ CẢNH BÁO NỘP BÀI TỰ ĐỘNG!\nBạn đã rời khỏi màn hình làm bài quá ${MAX_CHEAT_ALLOWED} lần quy định...`);
+                    alert(`⚠ CẢNH BÁO NỘP BÀI TỰ ĐỘNG!\nBạn đã rời khỏi màn hình làm bài quá ${MAX_CHEAT_ALLOWED} lần quy định. Hệ thống tự động thu bài và chấm điểm ngay lập tức!`);
                     forceSubmitQuiz();
                 } else {
-                    alert(`⚠ CẢNH BÁO GIAN LẬN (${cheatCount}/${MAX_CHEAT_ALLOWED})\nBạn không được phép rời khỏi màn hình làm bài thi!`);
+                    alert(`⚠ CẢNH BÁO GIAN LẬN (${cheatCount}/${MAX_CHEAT_ALLOWED})\nBạn không được phép rời khỏi màn hình làm bài thi!\nNếu tiếp tục vi phạm, hệ thống sẽ tự động nộp bài.`);
                 }
             };
 
@@ -1107,7 +1110,9 @@
             });
 
             window.addEventListener('blur', () => {
-                handleViolation();
+                setTimeout(() => {
+                    handleViolation();
+                }, 200);
             });
         }
 
