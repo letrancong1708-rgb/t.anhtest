@@ -959,31 +959,19 @@
         };
 
         // ===== CHỨC NĂNG THOÁT BÀI / ĐĂNG XUẤT CỦA HỌC SINH =====
+        // ===== CHỨC NĂNG THOÁT BÀI / ĐĂNG XUẤT CỦA HỌC SINH =====
         window.logoutStudent = function() {
             // Nếu học sinh chưa nộp bài, kích hoạt trạng thái thoát để không bị tính gian lận khi hiện confirm
             if (!isSubmitted) {
                 isExiting = true; // Bật cờ thoát hợp lệ
                 
                 if (!confirm("⚠ CẢNH BÁO: Bạn chưa nộp bài! Nếu thoát bây giờ, kết quả làm bài của bạn sẽ bị mất và không được lưu lại. Bạn vẫn muốn thoát chứ?")) {
-                    isExiting = false; // Học sinh bấm Hủy -> tắt cờ thoát để tiếp tục giám sát gian lận
+                    isExiting = false; // Học sinh bấm Hủy -> tiếp tục giám sát gian lận
                     return;
                 }
             }
             
-            if (timerInterval) clearInterval(timerInterval);
-            
-            isSubmitted = false;
-            currentStudentName = "";
-            currentStudentClass = "";
-            studentAnswers = {};
-            cheatCount = 0;
-            isExiting = false; // Reset lại biến
-            
-            document.getElementById("quiz-screen").style.display = "none";
-            document.getElementById("auth-screen").style.display = "flex";
-            window.switchAuthMode(false);
-            
-            // Xóa bộ đếm thời gian thi
+            // Xóa bộ đếm thời gian thi nếu có
             if (timerInterval) clearInterval(timerInterval);
             
             // Reset các biến trạng thái về mặc định
@@ -992,11 +980,25 @@
             currentStudentClass = "";
             studentAnswers = {};
             cheatCount = 0;
+            isExiting = false;
             
-            // Quay về màn hình nhập thông tin học sinh ban đầu
+            // 1. Ẩn màn hình làm bài và hiện lại màn hình Đăng nhập gốc
             document.getElementById("quiz-screen").style.display = "none";
             document.getElementById("auth-screen").style.display = "flex";
-            window.switchAuthMode(false); // Chuyển về chế độ nhập thông tin học sinh
+            
+            // 2. Ép buộc hiển thị các ô nhập thông tin của học sinh (Tên, Lớp) và ẩn ô mật khẩu giáo viên
+            document.querySelectorAll('.student-group').forEach(el => el.style.display = 'block');
+            document.querySelectorAll('.teacher-group').forEach(el => el.style.display = 'none');
+            
+            // 3. Đổi lại tiêu đề và nút bấm về chế độ Học sinh
+            document.getElementById('auth-title').innerText = "Thông Tin Học Sinh";
+            document.getElementById('auth-desc').innerText = "Vui lòng nhập đúng thông tin để hệ thống ghi nhận điểm.";
+            document.getElementById('btn-submit-auth').innerText = "Vào Làm Bài Thử";
+            
+            // 4. Xóa sạch các ô input cũ học sinh đã nhập trước đó để người sau nhập mới
+            document.getElementById('student-name').value = "";
+            document.getElementById('student-class').value = "";
+            document.getElementById('teacher-password').value = "";
         };
 
         // ===== KHỞI TẠO GIAO DIỆN LÀM BÀI =====
